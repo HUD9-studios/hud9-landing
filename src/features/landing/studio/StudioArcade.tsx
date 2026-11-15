@@ -18,7 +18,7 @@ export function StudioArcade() {
       width={sceneWidth}
       height={sceneHeight}
       className={styles.arcade}
-      aria-hidden="true"
+      inert
     />
   );
 }

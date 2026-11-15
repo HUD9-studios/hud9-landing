@@ -79,10 +79,10 @@ function fitsViewport(
 ) {
   const style = getComputedStyle(frame);
   const top = Math.max(
-    parseFloat(style.paddingBlockStart) || 0,
+    Number.parseFloat(style.paddingBlockStart) || 0,
     header?.offsetHeight ?? 0,
   );
-  const bottom = parseFloat(style.paddingBlockEnd) || 0;
+  const bottom = Number.parseFloat(style.paddingBlockEnd) || 0;
   const viewportHeight = Math.min(window.innerHeight, visualHeight ?? Infinity);
   return (
     layout.offsetHeight > 0 &&

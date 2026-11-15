@@ -96,7 +96,7 @@ it.each([
     const arcade = region.querySelector('canvas');
     const heading = studio.getByRole('heading', { level: 2, name: title });
 
-    expect(arcade?.getAttribute('aria-hidden')).toBe('true');
+    expect(arcade?.hasAttribute('inert')).toBe(true);
     expect(arcade?.compareDocumentPosition(heading)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
