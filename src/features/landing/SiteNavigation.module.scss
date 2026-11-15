@@ -39,11 +39,11 @@
   }
 
   a:hover,
-  .home {
+  a[aria-current='location'] {
     color: var(--landing-accent);
   }
 
-  .home::after {
+  a[aria-current='location']::after {
     position: absolute;
     inset: auto 0.38rem 0.24rem;
     block-size: 0.15rem;
@@ -138,11 +138,11 @@
     }
 
     a:hover,
-    .home {
+    a[aria-current='location'] {
       background: #102c38;
     }
 
-    .home::after {
+    a[aria-current='location']::after {
       content: none;
     }
   }

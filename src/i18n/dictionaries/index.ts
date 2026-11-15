@@ -98,6 +98,46 @@ function createServices(t: Translate): Dictionary['landing']['services'] {
   };
 }
 
+function createStudio(t: Translate): Dictionary['landing']['studio'] {
+  return {
+    label: t('02 / EL ESTUDIO', '02 / THE STUDIO'),
+    title: t('El estudio', 'The studio'),
+    titleStart: t('Distintas trayectorias.', 'Different backgrounds.'),
+    titleEmphasis: t('Una misma visión.', 'One shared vision.'),
+    introduction: t(
+      'HUD9 Studios nace de la unión de profesionales con experiencia en el desarrollo de videojuegos y aplicaciones interactivas para clientes y empresas.',
+      'HUD9 Studios brings together professionals with experience developing video games and interactive applications for clients and businesses.',
+    ),
+    approach: t(
+      'Reunimos talento creativo y conocimiento técnico para dar vida a nuevas ideas, construir experiencias memorables y explorar las posibilidades de la tecnología interactiva.',
+      'We combine creative talent and technical expertise to bring new ideas to life, build memorable experiences, and explore the possibilities of interactive technology.',
+    ),
+    pillars: {
+      experience: {
+        title: t('Experiencia', 'Experience'),
+        description: t(
+          'Trayectoria en proyectos reales para clientes y empresas.',
+          'Hands-on experience delivering projects for clients and businesses.',
+        ),
+      },
+      creativity: {
+        title: t('Creatividad', 'Creativity'),
+        description: t(
+          'Diseño, narrativa e ideas que dan vida a nuevas experiencias.',
+          'Design, storytelling, and ideas that bring new experiences to life.',
+        ),
+      },
+      technology: {
+        title: t('Tecnología', 'Technology'),
+        description: t(
+          'Desarrollo sólido y soluciones interactivas multiplataforma.',
+          'Robust development and cross-platform interactive solutions.',
+        ),
+      },
+    },
+  };
+}
+
 function createDictionary(locale: Locale): Dictionary {
   const t: Translate = (es, en) => ({ es, en })[locale];
 
@@ -116,18 +156,7 @@ function createDictionary(locale: Locale): Dictionary {
       header: createHeader(t),
       ...createHeroSections(t),
       services: createServices(t),
-      studio: {
-        title: t('El estudio', 'The studio'),
-        description: t(
-          'HUD9 Studios es un estudio independiente de videojuegos y experiencias interactivas.',
-          'HUD9 Studios is an independent studio creating video games and interactive experiences.',
-        ),
-        processTitle: t('Proceso', 'Process'),
-        process: t(
-          'Diseñamos, desarrollamos y experimentamos con videojuegos y tecnologías interactivas.',
-          'We design, develop and experiment with video games and interactive technologies.',
-        ),
-      },
+      studio: createStudio(t),
     },
   };
 }

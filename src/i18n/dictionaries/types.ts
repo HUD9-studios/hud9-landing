@@ -44,10 +44,17 @@ export interface Dictionary {
       simulators: ServiceCopy;
     };
     studio: {
+      label: string;
       title: string;
-      description: string;
-      processTitle: string;
-      process: string;
+      titleStart: string;
+      titleEmphasis: string;
+      introduction: string;
+      approach: string;
+      pillars: {
+        experience: ServiceCopy;
+        creativity: ServiceCopy;
+        technology: ServiceCopy;
+      };
     };
   };
 }

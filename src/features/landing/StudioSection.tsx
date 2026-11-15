@@ -1,5 +1,7 @@
 import type { Dictionary } from '@/i18n/dictionaries/types';
-import styles from './StudioSection.module.scss';
+import { StudioArcade } from './studio/StudioArcade';
+import { StudioContent } from './studio/StudioContent';
+import { StudioStory } from './studio/StudioStory';
 
 export function StudioSection({
   copy,
@@ -7,18 +9,9 @@ export function StudioSection({
   copy: Dictionary['landing']['studio'];
 }) {
   return (
-    <section
-      className={styles.studio}
-      id="studio"
-      aria-labelledby="studio-title"
-      tabIndex={-1}
-    >
-      <h2 id="studio-title">{copy.title}</h2>
-      <p>{copy.description}</p>
-      <h3 id="process" tabIndex={-1}>
-        {copy.processTitle}
-      </h3>
-      <p>{copy.process}</p>
-    </section>
+    <StudioStory>
+      <StudioArcade />
+      <StudioContent copy={copy} />
+    </StudioStory>
   );
 }
