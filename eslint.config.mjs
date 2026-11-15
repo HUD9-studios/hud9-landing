@@ -24,8 +24,10 @@ export default defineConfig([
     ],
   },
   {
-    files: ['scripts/**/*.mjs'],
-    languageOptions: { globals: { console: 'readonly', process: 'readonly' } },
+    files: ['scripts/**/*.mjs', 'tests/**/*.mjs'],
+    languageOptions: {
+      globals: { Buffer: 'readonly', console: 'readonly', process: 'readonly' },
+    },
   },
   {
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}'],

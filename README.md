@@ -60,12 +60,14 @@ Añade los textos visibles y los metadatos a los diccionarios `en.ts` y `es.ts` 
 
 El pre-commit valida UTF-8 sin BOM, LF, salto final y ausencia de espacios al final de línea. Usa los atributos de Git del índice para excluir binarios y solo revisa el destino de un renombre. Git puede normalizar los finales de línea al ejecutar `git add`. `npm run encoding:check` revisa el árbol de trabajo completo y `npm run encoding:check -- "ruta con espacios.ts"` valida esa ruta en el índice si está staged.
 
-Ejecuta `npm run quality` antes de solicitar un PR. Se detiene al primer error de lint, formato, tipos, codificación, pruebas con cobertura, auditoría o build. GitHub Actions ejecuta las comprobaciones del checkout completo y mantiene los controles remotos de seguridad y Sonar. En Actions, `HUSKY=0` evita que `npm ci` instale hooks locales.
+El verificador ejecuta Git desde una instalación administrada por el sistema. En Linux y otros sistemas POSIX admite ubicaciones de sistema y exige que el ejecutable y todos sus directorios padre pertenezcan a root y carezcan de escritura de grupo u otros. En Windows usa las carpetas conocidas de Program Files obtenidas con PowerShell del sistema. Verifica propietario y permisos de escritura del ejecutable y de los directorios de instalación y rechaza puntos de reanálisis. El ejecutable se invoca por ruta absoluta, con argumentos separados. Las instalaciones portables o en perfiles de usuario quedan fuera de este modelo. Si no hay una instalación verificable, la comprobación falla con un mensaje explícito.
+
+Ejecuta `npm run quality` antes de solicitar un PR. Se detiene al primer error de lint, formato, tipos, codificación, pruebas con cobertura, auditoría o build. GitHub Actions ejecuta las comprobaciones del checkout completo y mantiene los controles remotos de seguridad y Sonar. Actions usa `npm ci --ignore-scripts` con `HUSKY=0`. En instalaciones locales, `prepare` sigue instalando los hooks.
 
 ## Pruebas y cobertura
 
 - `npm test` abre Vitest en modo interactivo. `npm run test:run` ejecuta la suite una vez.
-- `npm run test:coverage` ejecuta la suite con V8 y genera `coverage/lcov.info`. La cobertura incluye todo el TypeScript de producción en `src/`, salvo declaraciones de tipos. Los artefactos de Next.js, las pruebas y las configuraciones quedan fuera de este alcance.
+- `npm run test:coverage` ejecuta la suite con V8 y genera `coverage/lcov.info`. La cobertura incluye el TypeScript de producción en `src/` salvo declaraciones, los scripts de calidad y la configuración de Next.js. El informe deja fuera los artefactos de Next.js y las pruebas.
 - Los umbrales iniciales de líneas, sentencias, funciones y ramas son **70 % global** y **90 % en `src/i18n/`**. Esto protege la lógica de idioma y permite ampliar la interfaz sin exigir cobertura de cada línea.
 
 ## CI, seguridad y SonarQube Cloud
