@@ -4,7 +4,14 @@
   --landing-ink: #04111c;
   --landing-paper: #f6fbff;
   --landing-accent: #00efff;
+  --studio-base: #030910;
   --landing-gutter: clamp(1.125rem, 4.5vw, 5.25rem);
+  --landing-logo-width: clamp(12.5rem, 18.4vw, 19.5rem);
+  --landing-header-padding: 0.45rem;
+  --landing-header-height: calc(
+    var(--landing-logo-width) * 176 / 512 + 2 * var(--landing-header-padding)
+  );
+  --landing-anchor-offset: calc(var(--landing-header-height) + 0.75rem);
   --landing-backdrop-image: url('/images/hero/hud9-hero-background.webp');
   --landing-backdrop-height: max(25rem, 56.25vw);
   --landing-backdrop-position: center top;
@@ -19,6 +26,10 @@
   min-block-size: 100svh;
   color: var(--landing-paper);
   background: var(--landing-ink);
+
+  &:focus {
+    outline: none;
+  }
 
   &::before {
     position: absolute;
@@ -44,10 +55,24 @@
   outline: none;
 }
 
+.main,
+.main :is(section, article)[id] {
+  scroll-margin-block-start: var(--landing-anchor-offset);
+}
+
+.main section[data-studio-pinned] {
+  scroll-margin-block-start: 0;
+}
+
 .stage {
   display: flex;
   flex-direction: column;
   padding: clamp(1.75rem, 2.9vw, 3.1rem) var(--landing-gutter) 1.9rem;
+  background: linear-gradient(
+    180deg,
+    transparent calc(100% - 6rem),
+    var(--studio-base)
+  );
 }
 
 .hero {
@@ -115,6 +140,13 @@
   .hero {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
     gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+}
+
+@media (width < breakpoints.$navigation) {
+  .landing {
+    --landing-logo-width: clamp(9rem, 31vw, 13rem);
+    --landing-header-padding: 0.65rem;
   }
 }
 

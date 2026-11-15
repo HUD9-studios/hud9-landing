@@ -39,7 +39,7 @@ describe('localized routes', () => {
       const document = await LocaleLayout({ children: page, params });
 
       expect(renderToStaticMarkup(document)).toContain(
-        `<html lang="${locale}" class="font-inter font-rajdhani">`,
+        `<html lang="${locale}" data-scroll-behavior="smooth" class="font-inter font-rajdhani">`,
       );
       await expect(generateMetadata(props)).resolves.toEqual({
         title,

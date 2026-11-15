@@ -1,30 +1,83 @@
+@use 'breakpoints';
+
+.story {
+  background: var(--studio-base);
+}
+
 .studio {
-  padding: 4rem var(--landing-gutter) 5rem;
-  border-block-start: 1px solid rgb(0 239 255 / 30%);
-  background: #061824;
+  --studio-cyan: #00e5f0;
+  --studio-glow: #5df7ff;
+  --studio-paper: #f4f8fc;
+  --studio-muted: #a9bac8;
+  --studio-background: url('/images/studio/hud9-studio-background-desktop.webp');
+  --studio-top-padding: clamp(3rem, 5.5vw, 6rem);
+  position: relative;
+  isolation: isolate;
+  padding: var(--studio-top-padding) var(--landing-gutter)
+    clamp(3.5rem, 6.5vw, 7rem);
+  color: var(--studio-paper);
+  background: var(--studio-base);
 
-  :is(h2, h3, p) {
-    max-inline-size: 52rem;
-    margin-inline: auto;
+  &::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background:
+      linear-gradient(
+        180deg,
+        var(--studio-base),
+        transparent clamp(4.5rem, 9vw, 9rem),
+        transparent 88%,
+        var(--studio-base)
+      ),
+      var(--studio-background) center / cover no-repeat;
+    content: '';
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(1.45rem, 3vw, 3.3rem);
+  inline-size: min(100%, 100rem);
+  margin-inline: auto;
+}
+
+@media (width < breakpoints.$navigation) {
+  .studio {
+    --studio-background: url('/images/studio/hud9-studio-background-portrait.webp');
+    --studio-top-padding: clamp(2.3rem, 6vw, 4rem);
+
+    &::before {
+      inset-block-end: auto;
+      block-size: min(100%, max(41rem, 133.333vw));
+    }
   }
 
-  :is(h2, h3) {
-    font-family: var(--font-display);
-    font-weight: 700;
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.65rem, 4.5vw, 3.4rem);
+    max-inline-size: 43rem;
   }
+}
 
-  h2 {
-    margin-block: 0 0.6rem;
-    color: var(--landing-accent);
-    font-size: clamp(2rem, 4vw, 3rem);
-  }
+@media (prefers-reduced-motion: no-preference) {
+  .story[data-studio-pinned] {
+    min-block-size: calc(100vh + clamp(31.25rem, 110vh, 66rem));
+    min-block-size: calc(100dvh + clamp(31.25rem, 110dvh, 66rem));
 
-  h3 {
-    margin-block: 1.6rem 0.35rem;
-  }
-
-  p {
-    margin-block: 0;
-    color: #d3e3ed;
+    .studio {
+      position: sticky;
+      inset-block-start: 0;
+      display: grid;
+      align-content: center;
+      block-size: 100vh;
+      block-size: 100dvh;
+      padding-block-start: max(
+        var(--studio-top-padding),
+        var(--landing-header-height)
+      );
+    }
   }
 }

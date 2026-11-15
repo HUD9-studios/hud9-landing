@@ -16,7 +16,7 @@ export function LandingPage({
   locale: Locale;
 }) {
   return (
-    <div className={styles.landing}>
+    <div id="home" className={styles.landing} tabIndex={-1}>
       <SiteHeader copy={copy.header} locale={locale} />
       <PageContainer id="content" className={styles.main}>
         <div className={styles.stage}>

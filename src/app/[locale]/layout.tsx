@@ -32,7 +32,11 @@ export default async function LocaleLayout({
   const locale = await getRouteLocale(params);
 
   return (
-    <html lang={locale} className={`${inter.variable} ${rajdhani.variable}`}>
+    <html
+      lang={locale}
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${rajdhani.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

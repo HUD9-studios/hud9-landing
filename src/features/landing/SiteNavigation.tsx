@@ -1,6 +1,12 @@
 'use client';
 
-import { useRef, useState, type HTMLAttributes } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type RefObject,
+} from 'react';
 import type { Dictionary } from '@/i18n/dictionaries/types';
 import styles from './SiteNavigation.module.scss';
 
@@ -15,6 +21,7 @@ type NavigationLinksCopy = Omit<
 >;
 
 type MenuDismissal = Pick<HTMLAttributes<HTMLElement>, 'onBlur' | 'onKeyDown'>;
+type ActiveSection = 'home' | 'studio' | null;
 
 export function SiteNavigation({
   copy: { menu, navigation, whatsappPending, ...links },
@@ -24,6 +31,7 @@ export function SiteNavigation({
   const [open, setOpen] = useState(false);
   const group = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const active = useActiveSection(group);
   const dismissal: MenuDismissal = {
     onBlur: (event) => {
       if (!group.current?.contains(event.relatedTarget)) setOpen(false);
@@ -48,15 +56,7 @@ export function SiteNavigation({
         {...dismissal}
         onClick={() => setOpen((previous) => !previous)}
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          aria-hidden="true"
-        >
-          <path d={open ? 'm6 6 12 12M18 6 6 18' : 'M3 6h18M3 12h18M3 18h18'} />
-        </svg>
+        <MenuIcon open={open} />
       </button>
       <nav
         id="primary-navigation"
@@ -65,6 +65,7 @@ export function SiteNavigation({
       >
         <NavigationLinks
           copy={links}
+          active={active}
           dismissal={dismissal}
           onNavigate={(id) => {
             if (!open) return;
@@ -75,6 +76,20 @@ export function SiteNavigation({
         <WhatsAppButton label={whatsappPending} />
       </nav>
     </div>
+  );
+}
+
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
+      <path d={open ? 'm6 6 12 12M18 6 6 18' : 'M3 6h18M3 12h18M3 18h18'} />
+    </svg>
   );
 }
 
@@ -106,10 +121,12 @@ function WhatsAppButton({ label }: { label: string }) {
 
 function NavigationLinks({
   copy,
+  active,
   dismissal,
   onNavigate,
 }: {
   copy: NavigationLinksCopy;
+  active: ActiveSection;
   dismissal: MenuDismissal;
   onNavigate: (id: string) => void;
 }) {
@@ -124,8 +141,7 @@ function NavigationLinks({
         <li key={id}>
           <a
             href={`#${id}`}
-            className={id === 'home' ? styles.home : undefined}
-            aria-current={id === 'home' ? 'page' : undefined}
+            aria-current={id === active ? 'location' : undefined}
             {...dismissal}
             onClick={() => onNavigate(id)}
           >
@@ -145,4 +161,52 @@ function NavigationLinks({
       </li>
     </ul>
   );
+}
+
+function useActiveSection(group: RefObject<HTMLDivElement | null>) {
+  const [active, setActive] = useState<ActiveSection>('home');
+
+  useEffect(() => {
+    const studio = document.getElementById('studio');
+    const header = group.current?.closest('header');
+    if (!studio || !header) return;
+
+    let pendingFrame: number | undefined;
+    let previous: ActiveSection | undefined;
+    const update = () => {
+      pendingFrame = undefined;
+      const marker = header.getBoundingClientRect().bottom + 24;
+      const { top, bottom } = studio.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const studioAtPageEnd =
+        window.scrollY > 0 &&
+        window.scrollY + viewportHeight >=
+          document.documentElement.scrollHeight - 1 &&
+        top < viewportHeight &&
+        bottom >= viewportHeight - 1;
+      let current: ActiveSection = 'home';
+      if (bottom <= marker) current = null;
+      else if (top <= marker || studioAtPageEnd) current = 'studio';
+      if (current !== previous) {
+        previous = current;
+        setActive(current);
+      }
+    };
+    const schedule = () => {
+      pendingFrame ??= window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    window.addEventListener('hashchange', schedule);
+    return () => {
+      if (pendingFrame !== undefined) window.cancelAnimationFrame(pendingFrame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      window.removeEventListener('hashchange', schedule);
+    };
+  }, [group]);
+
+  return active;
 }
