@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, type HTMLAttributes } from 'react';
 import type { Dictionary } from '@/i18n/dictionaries/types';
 import styles from './SiteNavigation.module.scss';
 
@@ -14,27 +14,30 @@ type NavigationLinksCopy = Omit<
   'menu' | 'navigation' | 'whatsappPending'
 >;
 
+type MenuDismissal = Pick<HTMLAttributes<HTMLElement>, 'onBlur' | 'onKeyDown'>;
+
 export function SiteNavigation({
   copy: { menu, navigation, whatsappPending, ...links },
 }: {
   copy: NavigationCopy;
 }) {
   const [open, setOpen] = useState(false);
+  const group = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const dismissal: MenuDismissal = {
+    onBlur: (event) => {
+      if (!group.current?.contains(event.relatedTarget)) setOpen(false);
+    },
+    onKeyDown: (event) => {
+      if (event.key !== 'Escape' || !open) return;
+      event.preventDefault();
+      setOpen(false);
+      trigger.current?.focus();
+    },
+  };
 
   return (
-    <div
-      className={styles.navGroup}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
-      }}
-      onKeyDown={(event) => {
-        if (event.key !== 'Escape' || !open) return;
-        event.preventDefault();
-        setOpen(false);
-        trigger.current?.focus();
-      }}
-    >
+    <div ref={group} className={styles.navGroup}>
       <button
         ref={trigger}
         type="button"
@@ -42,6 +45,7 @@ export function SiteNavigation({
         aria-label={menu}
         aria-controls="primary-navigation"
         aria-expanded={open}
+        {...dismissal}
         onClick={() => setOpen((previous) => !previous)}
       >
         <svg
@@ -61,6 +65,7 @@ export function SiteNavigation({
       >
         <NavigationLinks
           copy={links}
+          dismissal={dismissal}
           onNavigate={(id) => {
             if (!open) return;
             setOpen(false);
@@ -101,9 +106,11 @@ function WhatsAppButton({ label }: { label: string }) {
 
 function NavigationLinks({
   copy,
+  dismissal,
   onNavigate,
 }: {
   copy: NavigationLinksCopy;
+  dismissal: MenuDismissal;
   onNavigate: (id: string) => void;
 }) {
   const links = [
@@ -119,6 +126,7 @@ function NavigationLinks({
             href={`#${id}`}
             className={id === 'home' ? styles.home : undefined}
             aria-current={id === 'home' ? 'page' : undefined}
+            {...dismissal}
             onClick={() => onNavigate(id)}
           >
             {label}

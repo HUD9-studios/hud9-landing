@@ -2,10 +2,7 @@
 @use 'frame';
 
 .services {
-  @include frame.frame(
-    clamp(1rem, 1.75vw, 1.9rem),
-    linear-gradient(110deg, #03101b, #051925)
-  );
+  @include frame.frame(clamp(1rem, 1.75vw, 1.9rem));
 
   inline-size: min(100%, 100rem);
   margin: clamp(2rem, 4.85vw, 5rem) auto 0;
@@ -56,6 +53,14 @@
     font-size: clamp(0.88rem, 0.99vw, 1.06rem);
     line-height: 1.35;
   }
+}
+
+.services::before {
+  @include frame.layer(-2, 0, var(--landing-accent));
+}
+
+.services::after {
+  @include frame.layer(-1, 0.135rem, linear-gradient(110deg, #03101b, #051925));
 }
 
 @media (width < breakpoints.$wide) {

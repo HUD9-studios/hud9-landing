@@ -2,10 +2,7 @@
 @use 'frame';
 
 .panel {
-  @include frame.frame(
-    clamp(1rem, 1.65vw, 1.75rem),
-    linear-gradient(140deg, #03101b 48%, #052232)
-  );
+  @include frame.frame(clamp(1rem, 1.65vw, 1.75rem));
 
   display: grid;
   grid-template:
@@ -17,6 +14,18 @@
   gap: clamp(0.75rem, 1.2vw, 1.25rem) clamp(0.5rem, 1.25vw, 1.4rem);
   padding: clamp(1.35rem, 2.25vw, 2.5rem);
   scroll-margin-block-start: 1rem;
+}
+
+.panel::before {
+  @include frame.layer(-2, 0, var(--landing-accent));
+}
+
+.panel::after {
+  @include frame.layer(
+    -1,
+    0.135rem,
+    linear-gradient(140deg, #03101b 48%, #052232)
+  );
 }
 
 .eyebrow {

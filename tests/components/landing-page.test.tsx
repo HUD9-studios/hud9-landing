@@ -119,6 +119,15 @@ it.each(['es', 'en'] as const)(
     expect(document.activeElement).toBe(toggle);
 
     fireEvent.click(toggle);
+    fireEvent.blur(toggle, { relatedTarget: studio });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.blur(studio, {
+      relatedTarget: screen.getByRole('main'),
+    });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+
+    fireEvent.click(toggle);
     fireEvent.click(studio);
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement?.id).toBe('studio');

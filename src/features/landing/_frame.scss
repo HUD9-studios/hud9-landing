@@ -1,4 +1,4 @@
-@mixin frame($cut, $fill) {
+@mixin frame($cut) {
   --frame-cut: #{$cut};
   --frame-shape: polygon(
     var(--frame-cut) 0,
@@ -14,24 +14,14 @@
   position: relative;
   isolation: isolate;
   filter: drop-shadow(0 0 0.5rem rgb(0 238 255 / 32%));
+}
 
-  &::before,
-  &::after {
-    position: absolute;
-    clip-path: var(--frame-shape);
-    pointer-events: none;
-    content: '';
-  }
-
-  &::before {
-    z-index: -2;
-    inset: 0;
-    background: var(--landing-accent);
-  }
-
-  &::after {
-    z-index: -1;
-    inset: 0.135rem;
-    background: $fill;
-  }
+@mixin layer($level, $inset, $background) {
+  position: absolute;
+  z-index: $level;
+  inset: $inset;
+  background: $background;
+  clip-path: var(--frame-shape);
+  pointer-events: none;
+  content: '';
 }
