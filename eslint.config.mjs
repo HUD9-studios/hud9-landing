@@ -16,7 +16,7 @@ export default defineConfig([
   ]),
   js.configs.recommended,
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}', 'vitest.config.mts'],
     extends: [
       typescript.configs.recommended,
       next.configs['core-web-vitals'],
@@ -28,7 +28,7 @@ export default defineConfig([
     languageOptions: { globals: { console: 'readonly', process: 'readonly' } },
   },
   {
-    files: ['**/*.{mjs,ts,tsx}'],
+    files: ['**/*.{mjs,mts,ts,tsx}'],
     rules: {
       complexity: ['error', 12],
       'max-lines': [

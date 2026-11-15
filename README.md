@@ -4,7 +4,7 @@ Sitio oficial de HUD9 Studios, un estudio de desarrollo de videojuegos y tecnolo
 
 ## Entorno y ejecución
 
-Usa Node.js 24 LTS con el parche más reciente de esa línea, npm 11 y Git. Instala las versiones fijadas en `package-lock.json` con `npm ci`.
+Usa Node.js 24 LTS (24.15.0 o posterior dentro de la rama 24), npm 11 y Git. Usa el último parche de seguridad disponible. Instala las versiones fijadas en `package-lock.json` con `npm ci`.
 
 ```bash
 npm ci
@@ -53,6 +53,30 @@ Añade los textos visibles y los metadatos a los diccionarios `en.ts` y `es.ts` 
 | `npm run format:check`   | Comprueba el formato sin escribir archivos.                                                    |
 | `npm run typecheck`      | Genera los tipos de rutas y comprueba TypeScript en modo estricto.                             |
 | `npm run encoding:check` | Valida la codificación y los finales de línea sin escribir archivos.                           |
+
+## Pruebas y cobertura
+
+- `npm test` abre Vitest en modo interactivo. `npm run test:run` ejecuta la suite una vez.
+- `npm run test:coverage` ejecuta la suite con V8 y genera `coverage/lcov.info`. La cobertura incluye todo el TypeScript de producción en `src/`, salvo declaraciones de tipos. Los artefactos de Next.js, las pruebas y las configuraciones quedan fuera de este alcance.
+- Los umbrales iniciales de líneas, sentencias, funciones y ramas son **70 % global** y **90 % en `src/i18n/`**. Esto protege la lógica de idioma y permite ampliar la interfaz sin exigir cobertura de cada línea.
+
+## CI, seguridad y SonarQube Cloud
+
+[Quality and security](.github/workflows/quality.yml) se ejecuta en PR hacia `main` y en pushes a cualquier rama, incluida `main`. Los pushes de etiquetas quedan fuera del trigger. Los pushes a `main` permiten inicializar y mantener la línea base de Sonar. El job Quality usa Node.js 24, caché de npm, una instalación y un build. En orden ejecuta lint, formato, tipos, codificación, pruebas con cobertura y `npm audit --include=dev` antes del build. Cada comprobación detiene el job si falla.
+
+Dependency Review bloquea vulnerabilidades nuevas en PR, incluidas las dependencias de desarrollo. CodeQL analiza JavaScript y TypeScript sin recompilar y publica resultados en GitHub. Un job de CodeQL verde confirma la ejecución y publicación del análisis. La regla **Require code scanning results** determina si los hallazgos bloquean el merge. Las acciones se fijan por SHA y solo CodeQL recibe permiso de escritura de eventos de seguridad.
+
+Sonar analiza TypeScript, JavaScript y estilos. El job `Quality` genera `coverage/lcov.info` en Ubuntu desde la raíz del checkout y verifica que el reporte tenga contenido. El escáner lee esa misma ruta relativa en el mismo job. Sonar es obligatorio en PR hacia `main` y pushes a `main`. Si falta `SONAR_TOKEN` o falla el Quality Gate, falla `Quality`. [Proyecto en SonarQube Cloud](https://sonarcloud.io/project/overview?id=HUD9-studios_hud9-landing)
+
+`Quality` bloquea los PR de forks o de Dependabot antes del checkout y del acceso al secreto. Dependency Review y CodeQL son jobs independientes de Sonar. Para integrar esos cambios, un mantenedor debe revisarlos y abrir un PR desde una rama de confianza. Mantener cobertura y escaneo en el mismo job evita transferir artefactos entre contextos con distintos permisos.
+
+Antes de integrar a `main`:
+
+1. Confirma que la política de Actions permite los SHA del workflow, que el Dependency Graph está habilitado y que CodeQL está en modo avanzado si ya se usaba la configuración predeterminada.
+2. En SonarQube Cloud, confirma la vinculación con GitHub y el soporte de PR. Usa análisis desde CI y desactiva el análisis automático si estaba activo. Confirma que `SONAR_TOKEN` existe en GitHub y tiene permiso de análisis. El primer análisis debe ser de `main`. Si aún falta, completa el alta inicial del proyecto con un análisis autorizado del checkout real de `main` antes del primer PR. Si `main` todavía carece de `src/`, usa el alcance de fuentes que exista en ese checkout para la inicialización.
+3. Tras la primera ejecución autorizada, activa el ruleset para `main`. En **Require status checks to pass**, exige `Quality`, `Dependency Review` y `CodeQL (JavaScript/TypeScript)`. En **Require code scanning results**, añade **CodeQL** y configura **Security alerts → All** para bloquear cualquier alerta de seguridad nueva. El umbral **Alerts** controla los demás hallazgos por separado. [Protección de merges con code scanning](https://docs.github.com/en/code-security/how-tos/find-and-fix-code-vulnerabilities/manage-your-configuration/set-merge-protection)
+
+Para revisar el override de `minimatch`, consulta las versiones estables de `typescript-eslint` y `@typescript-eslint/typescript-estree`. Cuando el parser estable declare una versión corregida, actualiza el paquete compatible, retira el override y regenera el lockfile. Comprueba la resolución con `npm ls minimatch` y ejecuta `npm ci`, auditoría, lint, pruebas y build antes de conservar el cambio.
 
 ## Codificación
 
