@@ -1,26 +1,47 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { relative, resolve, sep } from 'node:path';
 import { TextDecoder } from 'node:util';
 
 const root = resolve(import.meta.dirname, '..');
 const decoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
+const args = process.argv.slice(2);
+const requestedPaths = args[0] === '--' ? args.slice(1) : args;
+const staged = args.length > 0;
+
+function git(command, options) {
+  return execFileSync('git', command, {
+    cwd: root,
+    maxBuffer: Infinity,
+    ...options,
+  });
+}
 
 function listTextFiles() {
-  const files = execFileSync(
-    'git',
-    ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
-    {
-      cwd: root,
-    },
+  const paths = staged
+    ? git(
+        ['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z', '--'],
+        {
+          encoding: 'utf8',
+        },
+      )
+    : git(['ls-files', '-z', '--cached', '--others', '--exclude-standard'], {
+        encoding: 'utf8',
+      });
+  const requested = new Set(
+    requestedPaths.map((file) =>
+      relative(root, resolve(file)).split(sep).join('/'),
+    ),
   );
+  const files = paths
+    .split('\0')
+    .filter((file) => file && (!staged || requested.has(file)));
+  if (files.length === 0) return new Set();
 
-  const attributes = execFileSync(
-    'git',
-    ['check-attr', '-z', '--stdin', 'text'],
+  const attributes = git(
+    ['check-attr', ...(staged ? ['--cached'] : []), '-z', '--stdin', 'text'],
     {
-      cwd: root,
-      input: files,
+      input: files.join('\0') + '\0',
       encoding: 'utf8',
     },
   ).split('\0');
@@ -33,15 +54,20 @@ function listTextFiles() {
   );
 }
 
-function validateFile(file) {
-  let bytes;
+function readTextFile(file) {
+  if (staged) return git(['cat-file', 'blob', ':' + file]);
 
   try {
-    bytes = readFileSync(resolve(root, file));
+    return readFileSync(resolve(root, file));
   } catch (error) {
-    if (error.code === 'ENOENT') return [];
-    throw error;
+    if (error.code !== 'ENOENT') throw error;
+    return undefined;
   }
+}
+
+function validateFile(file) {
+  const bytes = readTextFile(file);
+  if (!bytes) return [];
 
   let source;
 

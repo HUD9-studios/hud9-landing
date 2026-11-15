@@ -21,6 +21,7 @@ jobs:
     timeout-minutes: 20
     env:
       NEXT_TELEMETRY_DISABLED: '1'
+      HUSKY: '0'
 
     steps:
       - name: Block pull requests without trusted Sonar credentials

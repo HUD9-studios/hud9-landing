@@ -54,6 +54,14 @@ Añade los textos visibles y los metadatos a los diccionarios `en.ts` y `es.ts` 
 | `npm run typecheck`      | Genera los tipos de rutas y comprueba TypeScript en modo estricto.                             |
 | `npm run encoding:check` | Valida la codificación y los finales de línea sin escribir archivos.                           |
 
+## Validación local antes del PR
+
+`npm ci` ejecuta `prepare` e instala el hook de Husky. En cada commit, lint-staged verifica primero la codificación del índice de Git. Después Prettier formatea los archivos staged compatibles respetando `.prettierignore`, y ESLint revisa los archivos JavaScript y TypeScript staged con `--max-warnings=0`. La primera comprobación que falla bloquea el commit. lint-staged incorpora el formato al índice y conserva los cambios unstaged.
+
+El pre-commit valida UTF-8 sin BOM, LF, salto final y ausencia de espacios al final de línea. Usa los atributos de Git del índice para excluir binarios y solo revisa el destino de un renombre. Git puede normalizar los finales de línea al ejecutar `git add`. `npm run encoding:check` revisa el árbol de trabajo completo y `npm run encoding:check -- "ruta con espacios.ts"` valida esa ruta en el índice si está staged.
+
+Ejecuta `npm run quality` antes de solicitar un PR. Se detiene al primer error de lint, formato, tipos, codificación, pruebas con cobertura, auditoría o build. GitHub Actions ejecuta las comprobaciones del checkout completo y mantiene los controles remotos de seguridad y Sonar. En Actions, `HUSKY=0` evita que `npm ci` instale hooks locales.
+
 ## Pruebas y cobertura
 
 - `npm test` abre Vitest en modo interactivo. `npm run test:run` ejecuta la suite una vez.
