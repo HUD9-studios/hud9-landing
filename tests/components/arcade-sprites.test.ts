@@ -137,7 +137,7 @@ it('draws the impact at its original size above the ship', async () => {
   );
 });
 
-it('loads the complete enemy B sprite once and reuses it for both frames', async () => {
+it('loads the two distinct enemy B animation frames', async () => {
   const requested: string[] = [];
   vi.stubGlobal(
     'Image',
@@ -150,9 +150,10 @@ it('loads the complete enemy B sprite once and reuses it for both frames', async
   );
   const sprites = await loadSprites(new AbortController().signal);
   expect(sprites.b).toHaveLength(2);
-  expect(sprites.b[0]).toBe(sprites.b[1]);
+  expect(sprites.b[0]).not.toBe(sprites.b[1]);
   expect(requested.filter((url) => url.includes('/enemies/enemy_b_'))).toEqual([
     '/images/studio/assets/arcade/enemies/enemy_b_01.png',
+    '/images/studio/assets/arcade/enemies/enemy_b_02.png',
   ]);
 });
 

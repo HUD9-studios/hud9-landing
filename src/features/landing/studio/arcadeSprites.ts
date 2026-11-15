@@ -37,7 +37,6 @@ const sprites = {
     'player/yaw/player_right_03.png',
   ],
   a: ['enemies/enemy_a_01.png', 'enemies/enemy_a_02.png'],
-  // Hold the complete frame in both positions until enemy_b_02.png is replaced.
   b: ['enemies/enemy_b_01.png', 'enemies/enemy_b_02.png'],
   c: ['enemies/enemy_c_01.png', 'enemies/enemy_c_02.png'],
   d: ['enemies/enemy_d_01.png', 'enemies/enemy_d_02.png'],
