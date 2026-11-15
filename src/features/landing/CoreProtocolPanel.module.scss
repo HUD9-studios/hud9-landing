@@ -1,0 +1,208 @@
+@use 'breakpoints';
+@use 'frame';
+
+.panel {
+  @include frame.frame(clamp(1rem, 1.65vw, 1.75rem));
+
+  display: grid;
+  grid-template:
+    'eyebrow art'
+    'title art'
+    'description art'
+    'details art' / minmax(0, 1fr) minmax(0, 1.12fr);
+  align-content: center;
+  gap: clamp(0.75rem, 1.2vw, 1.25rem) clamp(0.5rem, 1.25vw, 1.4rem);
+  padding: clamp(1.35rem, 2.25vw, 2.5rem);
+  scroll-margin-block-start: 1rem;
+}
+
+.panel::before {
+  @include frame.layer(-2, 0, var(--landing-accent));
+}
+
+.panel::after {
+  @include frame.layer(
+    -1,
+    0.135rem,
+    linear-gradient(140deg, #03101b 48%, #052232)
+  );
+}
+
+.eyebrow {
+  display: flex;
+  grid-area: eyebrow;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0;
+  color: var(--landing-accent);
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 1.08vw, 1.18rem);
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  line-height: 1.12;
+  text-transform: uppercase;
+
+  svg {
+    flex: 0 0 clamp(2.25rem, 3.35vw, 3.65rem);
+    inline-size: clamp(2.25rem, 3.35vw, 3.65rem);
+    block-size: clamp(2.25rem, 3.35vw, 3.65rem);
+  }
+}
+
+.title {
+  grid-area: title;
+  margin: 0;
+  color: var(--landing-paper);
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 2.45vw, 2.8rem);
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.015em;
+  line-height: 0.94;
+  text-transform: uppercase;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 0.32em;
+  }
+
+  i {
+    inline-size: 1.55em;
+    block-size: 0.47em;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0 18%,
+      var(--landing-accent) 20% 32%,
+      transparent 38% 48%
+    );
+    transform: skew(-29deg);
+  }
+
+  em {
+    color: var(--landing-accent);
+    font-size: 1.3em;
+    font-style: inherit;
+  }
+}
+
+.art {
+  display: block;
+  grid-area: art;
+  align-self: center;
+  justify-self: center;
+  inline-size: 100%;
+  max-inline-size: 26rem;
+  block-size: auto;
+  object-fit: contain;
+  mix-blend-mode: screen;
+}
+
+.description {
+  grid-area: description;
+  max-inline-size: 33ch;
+  margin: 0;
+  font-size: clamp(0.94rem, 1.1vw, 1.18rem);
+  line-height: 1.43;
+}
+
+.details {
+  grid-area: details;
+  max-inline-size: 22rem;
+  margin-block-start: 0.2rem;
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.68rem;
+    inline-size: 100%;
+    min-block-size: clamp(2.75rem, 3.6vw, 3.9rem);
+    padding: 0.5rem 0.65rem;
+    border: 2px solid var(--landing-accent);
+    border-radius: 0.85rem 0.52rem;
+    background: #03101b;
+    box-shadow:
+      0 0 0.65rem rgb(0 239 255 / 65%),
+      inset 0 0 0.45rem rgb(0 239 255 / 30%);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(0.88rem, 1.15vw, 1.2rem);
+    letter-spacing: 0.025em;
+    line-height: 1.1;
+    list-style: none;
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color var(--motion-duration) ease;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background: #0a303c;
+    }
+
+    span {
+      flex: 0 0 auto;
+      inline-size: 0;
+      block-size: 0;
+      border-block: 0.46rem solid transparent;
+      border-inline-start: 0.72rem solid var(--landing-accent);
+    }
+  }
+
+  p {
+    margin: 0.85rem 0 0;
+    color: #d1e9f4;
+    font-size: 0.94rem;
+    line-height: 1.4;
+  }
+}
+
+@media (width >= breakpoints.$wide) {
+  .panel {
+    min-block-size: clamp(20rem, 24vw, 25.5rem);
+  }
+}
+
+@media (width < breakpoints.$wide) {
+  .art {
+    max-inline-size: 21rem;
+  }
+
+  .title {
+    font-size: clamp(1.9rem, 4.5vw, 2.65rem);
+  }
+}
+
+@include breakpoints.landscape-tablet {
+  .panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  }
+
+  .title {
+    font-size: clamp(1.6rem, 2.85vw, 2.1rem);
+  }
+}
+
+@media (width < breakpoints.$compact) {
+  .panel {
+    grid-template:
+      'eyebrow'
+      'title'
+      'art'
+      'description'
+      'details' / minmax(0, 1fr);
+  }
+
+  .art {
+    max-inline-size: 20rem;
+  }
+
+  .description,
+  .details {
+    max-inline-size: none;
+  }
+}

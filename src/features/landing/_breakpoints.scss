@@ -1,0 +1,9 @@
+$compact: 44rem;
+$navigation: 56rem;
+$wide: 72rem;
+
+@mixin landscape-tablet {
+  @media (60rem <= width < $wide) and (height >= 34rem) and (orientation: landscape) {
+    @content;
+  }
+}

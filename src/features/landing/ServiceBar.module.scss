@@ -1,0 +1,107 @@
+@use 'breakpoints';
+@use 'frame';
+
+.services {
+  @include frame.frame(clamp(1rem, 1.75vw, 1.9rem));
+
+  inline-size: min(100%, 100rem);
+  margin: clamp(2rem, 4.85vw, 5rem) auto 0;
+
+  ul {
+    display: grid;
+    grid-template-columns: 1.05fr 0.98fr 1.14fr 0.9fr;
+    align-items: stretch;
+    margin: 0;
+    padding: clamp(1rem, 1.65vw, 1.85rem) clamp(1rem, 1.95vw, 2.15rem);
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 1.35vw, 1.6rem);
+    min-inline-size: 0;
+    padding-inline: clamp(0.8rem, 1.65vw, 1.8rem);
+
+    & + li {
+      border-inline-start: 1px solid rgb(246 251 255 / 70%);
+    }
+  }
+
+  svg {
+    flex: 0 0 clamp(2.15rem, 3.8vw, 4rem);
+    inline-size: clamp(2.15rem, 3.8vw, 4rem);
+    block-size: clamp(2.15rem, 3.8vw, 4rem);
+    color: var(--landing-accent);
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.32vw, 1.45rem);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  p {
+    margin-block-start: 0.25rem;
+    color: #f1f8ff;
+    font-size: clamp(0.88rem, 0.99vw, 1.06rem);
+    line-height: 1.35;
+  }
+}
+
+.services::before {
+  @include frame.layer(-2, 0, var(--landing-accent));
+}
+
+.services::after {
+  @include frame.layer(-1, 0.135rem, linear-gradient(110deg, #03101b, #051925));
+}
+
+@media (width < breakpoints.$wide) {
+  .services {
+    margin-block-start: clamp(1.5rem, 4vw, 3rem);
+
+    ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-block: 0.4rem;
+    }
+
+    li {
+      padding-block: 0.85rem;
+    }
+
+    li:nth-child(n + 3) {
+      border-block-start: 1px solid rgb(246 251 255 / 28%);
+    }
+
+    li:nth-child(3) {
+      border-inline-start: 0;
+    }
+  }
+}
+
+@media (width < breakpoints.$compact) {
+  .services {
+    margin-block-start: 1.55rem;
+
+    ul {
+      grid-template-columns: minmax(0, 1fr);
+      padding-inline: 1.2rem;
+    }
+
+    li {
+      padding: 0.85rem 0.5rem;
+    }
+
+    li + li {
+      border-block-start: 1px solid rgb(246 251 255 / 28%);
+      border-inline-start: 0;
+    }
+  }
+}

@@ -1,7 +1,13 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import LocaleLayout, { generateStaticParams } from '@/app/[locale]/layout';
 import LocalePage, { generateMetadata } from '@/app/[locale]/page';
+
+vi.mock('next/font/local', () => ({
+  default: ({ variable }: { variable: string }) => ({
+    variable: variable.slice(2),
+  }),
+}));
 
 describe('localized routes', () => {
   it('prerenders only the supported App Router segments', () => {
@@ -33,7 +39,7 @@ describe('localized routes', () => {
       const document = await LocaleLayout({ children: page, params });
 
       expect(renderToStaticMarkup(document)).toContain(
-        `<html lang="${locale}">`,
+        `<html lang="${locale}" class="font-inter font-rajdhani">`,
       );
       await expect(generateMetadata(props)).resolves.toEqual({
         title,
