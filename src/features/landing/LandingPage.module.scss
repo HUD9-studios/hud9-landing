@@ -1,0 +1,153 @@
+@use 'breakpoints';
+
+.landing {
+  --landing-ink: #04111c;
+  --landing-paper: #f6fbff;
+  --landing-accent: #00efff;
+  --landing-gutter: clamp(1.125rem, 4.5vw, 5.25rem);
+  --landing-backdrop-image: url('/images/hero/hud9-hero-background.webp');
+  --landing-backdrop-height: max(25rem, 56.25vw);
+  --landing-backdrop-position: center top;
+  --landing-backdrop-shade: linear-gradient(
+    90deg,
+    rgb(2 12 22 / 68%),
+    rgb(2 12 22 / 25%) 37%,
+    transparent 62%
+  );
+  position: relative;
+  isolation: isolate;
+  min-block-size: 100svh;
+  color: var(--landing-paper);
+  background: var(--landing-ink);
+
+  &::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 auto;
+    block-size: var(--landing-backdrop-height);
+    background:
+      var(--landing-backdrop-header-shade, none),
+      var(--landing-backdrop-shade),
+      linear-gradient(0deg, var(--landing-ink), transparent 20%),
+      var(--landing-backdrop-image) var(--landing-backdrop-position) / cover
+        no-repeat;
+    content: '';
+  }
+
+  :is(a, button, summary):focus-visible {
+    outline: 2px solid var(--landing-paper);
+    outline-offset: 0.29rem;
+  }
+}
+
+.main {
+  outline: none;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.75rem, 2.9vw, 3.1rem) var(--landing-gutter) 1.9rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.14fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  inline-size: min(100%, 100rem);
+  margin-inline: auto;
+}
+
+.down {
+  display: grid;
+  place-items: center;
+  inline-size: 3.75rem;
+  min-block-size: 3.75rem;
+  align-self: center;
+  margin-block: 0.55rem 0;
+  color: var(--landing-accent);
+
+  span,
+  span::after {
+    inline-size: 1.85rem;
+    block-size: 1.85rem;
+    border-inline-end: 0.38rem solid currentColor;
+    border-block-end: 0.38rem solid currentColor;
+    transform: translateY(-0.52rem) rotate(45deg) skew(-6deg, -6deg);
+  }
+
+  span::after {
+    position: absolute;
+    inset: 0;
+    transform: translate(0.65rem, 0.65rem);
+    content: '';
+  }
+}
+
+@media (width >= breakpoints.$wide) {
+  .hero {
+    min-block-size: clamp(21rem, 28vw, 30rem);
+  }
+}
+
+@media (width < breakpoints.$wide) {
+  .landing {
+    --landing-backdrop-shade: linear-gradient(
+      90deg,
+      rgb(2 12 22 / 78%),
+      rgb(2 12 22 / 53%) 35%,
+      transparent 75%
+    );
+  }
+
+  .stage {
+    padding-block-start: clamp(1.4rem, 2.65vw, 1.9rem);
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.75rem, 3.2vw, 2.6rem);
+  }
+}
+
+@include breakpoints.landscape-tablet {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+}
+
+@media (width < breakpoints.$compact) {
+  .landing {
+    --landing-backdrop-height: clamp(26rem, 105vw, 35rem);
+    --landing-backdrop-shade: linear-gradient(
+      105deg,
+      rgb(2 12 22 / 82%),
+      rgb(2 12 22 / 54%) 51%,
+      rgb(2 12 22 / 12%)
+    );
+  }
+
+  .stage {
+    padding-block-start: clamp(1.65rem, 6vw, 2.6rem);
+  }
+
+  .hero {
+    gap: clamp(2rem, 5vw, 2.8rem);
+  }
+}
+
+@media (width < breakpoints.$compact),
+  (width < breakpoints.$wide) and (orientation: portrait),
+  (width < breakpoints.$wide) and (height < 30rem) and (pointer: coarse) {
+  .landing {
+    --landing-backdrop-image: url('/images/hero/hud9-hero-background-portrait.webp');
+    --landing-backdrop-position: center 69%;
+    --landing-backdrop-header-shade: linear-gradient(
+      180deg,
+      rgb(4 17 28 / 58%) 1.5rem,
+      transparent 7rem
+    );
+  }
+}

@@ -1,0 +1,37 @@
+@mixin frame($cut, $fill) {
+  --frame-cut: #{$cut};
+  --frame-shape: polygon(
+    var(--frame-cut) 0,
+    calc(100% - var(--frame-cut)) 0,
+    100% var(--frame-cut),
+    100% calc(100% - var(--frame-cut)),
+    calc(100% - var(--frame-cut)) 100%,
+    var(--frame-cut) 100%,
+    0 calc(100% - var(--frame-cut)),
+    0 var(--frame-cut)
+  );
+
+  position: relative;
+  isolation: isolate;
+  filter: drop-shadow(0 0 0.5rem rgb(0 238 255 / 32%));
+
+  &::before,
+  &::after {
+    position: absolute;
+    clip-path: var(--frame-shape);
+    pointer-events: none;
+    content: '';
+  }
+
+  &::before {
+    z-index: -2;
+    inset: 0;
+    background: var(--landing-accent);
+  }
+
+  &::after {
+    z-index: -1;
+    inset: 0.135rem;
+    background: $fill;
+  }
+}

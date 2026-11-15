@@ -1,0 +1,30 @@
+.studio {
+  padding: 4rem var(--landing-gutter) 5rem;
+  border-block-start: 1px solid rgb(0 239 255 / 30%);
+  background: #061824;
+
+  :is(h2, h3, p) {
+    max-inline-size: 52rem;
+    margin-inline: auto;
+  }
+
+  :is(h2, h3) {
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+
+  h2 {
+    margin-block: 0 0.6rem;
+    color: var(--landing-accent);
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+
+  h3 {
+    margin-block: 1.6rem 0.35rem;
+  }
+
+  p {
+    margin-block: 0;
+    color: #d3e3ed;
+  }
+}

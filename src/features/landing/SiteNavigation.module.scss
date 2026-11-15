@@ -1,0 +1,158 @@
+@use 'breakpoints';
+
+.menuToggle {
+  display: none;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(1rem, 2.3vw, 2rem);
+  min-inline-size: 0;
+  border-block-end: 1px solid rgb(0 239 255 / 68%);
+
+  ul {
+    display: flex;
+    gap: clamp(0.75rem, 2vw, 1.75rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a,
+  li > span {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: clamp(3.25rem, 4.2vw, 4.7rem);
+    padding: 0 0.38rem;
+    color: inherit;
+    font-size: clamp(1rem, 1.38vw, 1.45rem);
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    line-height: 1.1;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  a:hover,
+  .home {
+    color: var(--landing-accent);
+  }
+
+  .home::after {
+    position: absolute;
+    inset: auto 0.38rem 0.24rem;
+    block-size: 0.15rem;
+    background: var(--landing-accent);
+    content: '';
+  }
+
+  li > span {
+    color: #b8c8d0;
+  }
+}
+
+.whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  padding: 0.25rem 0.85rem;
+  border: 1px solid #27bca0;
+  border-radius: 0.42rem;
+  color: #e0f7ee;
+  background: #0b4438;
+  font: 700 clamp(1rem, 1.25vw, 1.22rem) / 1.15 var(--font-display);
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 1;
+    cursor: not-allowed;
+  }
+
+  svg {
+    inline-size: 1.2em;
+    block-size: 1.2em;
+  }
+}
+
+@media (width < breakpoints.$navigation) {
+  .navGroup {
+    position: relative;
+    z-index: 2;
+  }
+
+  .menuToggle {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--landing-accent);
+    border-radius: 0.42rem;
+    color: var(--landing-paper);
+    background: #06131c;
+    cursor: pointer;
+
+    &[aria-expanded='true'],
+    &:hover {
+      color: var(--landing-accent);
+      background: #102c38;
+    }
+
+    svg {
+      inline-size: 1.4rem;
+      block-size: 1.4rem;
+    }
+  }
+
+  .navigation {
+    position: absolute;
+    inset-block-start: calc(100% + 0.45rem);
+    inset-inline-end: 0;
+    display: none;
+    inline-size: 12rem;
+    padding: 0.4rem;
+    border: 1px solid var(--landing-accent);
+    border-radius: 0.42rem;
+    background: #06131c;
+    box-shadow: 0 0.8rem 1.5rem rgb(0 0 0 / 44%);
+
+    ul {
+      display: grid;
+      justify-content: stretch;
+      gap: 0.2rem;
+    }
+
+    a,
+    li > span {
+      justify-content: flex-start;
+      min-block-size: 2.75rem;
+      padding-inline: 0.75rem;
+      border-radius: 0.25rem;
+    }
+
+    a:hover,
+    .home {
+      background: #102c38;
+    }
+
+    .home::after {
+      content: none;
+    }
+  }
+
+  .menuToggle[aria-expanded='true'] + .navigation {
+    display: block;
+  }
+
+  .whatsapp {
+    inline-size: 100%;
+    margin-block-start: 0.35rem;
+  }
+}

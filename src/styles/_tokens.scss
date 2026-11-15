@@ -1,7 +1,8 @@
 :root {
   --color-surface: #fff;
   --color-text: #18181b;
-  --font-body: system-ui, sans-serif;
+  --font-body: var(--font-inter, system-ui), sans-serif;
+  --font-display: var(--font-rajdhani, system-ui), sans-serif;
   --size-content: 72rem;
   --space-gutter: clamp(1rem, 4vw, 2rem);
   --space-section: clamp(2rem, 8vw, 5rem);

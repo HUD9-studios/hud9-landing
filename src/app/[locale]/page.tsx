@@ -12,5 +12,5 @@ export async function generateMetadata({
 
 export default async function LocalePage({ params }: PageProps<'/[locale]'>) {
   const locale = await getRouteLocale(params);
-  return <LandingPage copy={getDictionary(locale).landing} />;
+  return <LandingPage locale={locale} copy={getDictionary(locale).landing} />;
 }
