@@ -1,7 +1,6 @@
 import type { Locale } from '../config';
-import type { Dictionary } from './types';
-
-type Translate = (es: string, en: string) => string;
+import { createContact } from './contact';
+import type { Dictionary, Translate } from './types';
 
 function createHeader(t: Translate): Dictionary['landing']['header'] {
   return {
@@ -16,10 +15,6 @@ function createHeader(t: Translate): Dictionary['landing']['header'] {
     home: t('Inicio', 'Home'),
     studio: t('El estudio', 'The studio'),
     contact: t('Contacto', 'Contact'),
-    contactPending: t(
-      'Contacto aún no disponible',
-      'Contact is not yet available',
-    ),
     whatsappPending: t(
       'WhatsApp aún no disponible',
       'WhatsApp is not yet available',
@@ -157,6 +152,7 @@ function createDictionary(locale: Locale): Dictionary {
       ...createHeroSections(t),
       services: createServices(t),
       studio: createStudio(t),
+      contact: createContact(t),
     },
   };
 }

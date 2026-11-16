@@ -3,6 +3,37 @@ interface ServiceCopy {
   description: string;
 }
 
+export type Translate = (es: string, en: string) => string;
+
+interface ContactFormCopy {
+  title: string;
+  name: ServiceLabel;
+  email: ServiceLabel;
+  phone: ServiceLabel & { country: string; search: string; noResults: string };
+  reason: ServiceLabel;
+  message: ServiceLabel;
+  reasons: Record<
+    'game' | 'collaboration' | 'immersive' | 'general' | 'other',
+    string
+  >;
+  characterCount: string;
+  submit: string;
+  unavailable: string;
+  required: string;
+  nameLength: string;
+  contactMethodRequired: string;
+  invalidEmail: string;
+  invalidPhone: string;
+  invalidReason: string;
+  messageTooShort: string;
+  messageTooLong: string;
+}
+
+interface ServiceLabel {
+  label: string;
+  placeholder: string;
+}
+
 export interface Dictionary {
   metadata: {
     title: string;
@@ -18,7 +49,6 @@ export interface Dictionary {
       home: string;
       studio: string;
       contact: string;
-      contactPending: string;
       whatsappPending: string;
     };
     hero: {
@@ -55,6 +85,16 @@ export interface Dictionary {
         creativity: ServiceCopy;
         technology: ServiceCopy;
       };
+    };
+    contact: {
+      label: string;
+      titleStart: string;
+      titleEmphasis: string;
+      description: string;
+      open: ServiceCopy & { status: string };
+      email: ServiceCopy;
+      whatsapp: ServiceCopy & { action: string; unavailable: string };
+      form: ContactFormCopy;
     };
   };
 }

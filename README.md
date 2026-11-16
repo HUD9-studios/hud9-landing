@@ -43,6 +43,12 @@ Al entrar por `/`, el proxy lee `Accept-Language`, considera los idiomas admitid
 
 Añade los textos visibles y los metadatos a los diccionarios `en.ts` y `es.ts` con el mismo contrato `Dictionary`. Cada página traduce su título y descripción mediante `generateMetadata`.
 
+## Contacto
+
+Configura `HUD9_CONTACT_EMAIL` con la dirección oficial y `HUD9_WHATSAPP_NUMBER` con el número internacional en dígitos, con o sin `+` inicial. Las rutas se prerenderizan y los canales se incorporan al compilar. El mismo número habilita WhatsApp en el encabezado y en Contacto.
+
+El formulario valida y conserva el borrador en la sesión de la pestaña. El teléfono es opcional. El selector comienza en Colombia y los números válidos se normalizan a E.164 en el modelo local. El envío y la consulta de canales oficiales se integrarán con la futura API de HUD9.
+
 ## Comandos de calidad
 
 | Comando                  | Función                                                                                        |
