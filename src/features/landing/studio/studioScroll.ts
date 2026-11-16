@@ -29,6 +29,7 @@ export function mountStudioStory(
   if (typeof window.matchMedia !== 'function') return () => {};
 
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const landscape = window.matchMedia('(orientation: landscape)');
   const viewport = window.visualViewport;
   const header = story.closest('#home')?.querySelector('header');
   const updateProgress = trackProgress(story, frame);
@@ -46,7 +47,9 @@ export function mountStudioStory(
 
   function measure() {
     pinned =
-      !motion.matches && fitsViewport(frame, layout, header, viewport?.height);
+      landscape.matches &&
+      !motion.matches &&
+      fitsViewport(frame, layout, header, viewport?.height);
     story.toggleAttribute('data-studio-pinned', pinned);
     if (pinned) updateProgress();
   }
@@ -56,6 +59,7 @@ export function mountStudioStory(
   window.addEventListener('resize', measure);
   viewport?.addEventListener('resize', measure);
   motion.addEventListener('change', measure);
+  landscape.addEventListener('change', measure);
   const resize =
     'ResizeObserver' in window ? new ResizeObserver(measure) : undefined;
   resize?.observe(layout);
@@ -67,6 +71,7 @@ export function mountStudioStory(
     window.removeEventListener('resize', measure);
     viewport?.removeEventListener('resize', measure);
     motion.removeEventListener('change', measure);
+    landscape.removeEventListener('change', measure);
     story.removeAttribute('data-studio-pinned');
   };
 }

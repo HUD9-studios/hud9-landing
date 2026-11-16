@@ -179,11 +179,16 @@ it('uses the same configured WhatsApp link in the header and contact section', (
   const copy = getDictionary('en').landing;
   render(<LandingPage locale="en" copy={copy} />);
 
-  for (const name of ['WhatsApp', copy.contact.whatsapp.action]) {
-    expect(screen.getByRole('link', { name }).getAttribute('href')).toBe(
-      'https://wa.me/12025550123',
-    );
-  }
+  const header = within(screen.getByRole('banner'));
+  const main = within(screen.getByRole('main'));
+  expect(
+    header.getByRole('link', { name: 'WhatsApp' }).getAttribute('href'),
+  ).toBe('https://wa.me/12025550123');
+  expect(
+    main
+      .getByRole('link', { name: copy.contact.whatsapp.action })
+      .getAttribute('href'),
+  ).toBe('https://wa.me/12025550123');
   expect(
     screen
       .getByRole('link', { name: 'studio@example.com' })

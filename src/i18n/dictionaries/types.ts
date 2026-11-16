@@ -96,5 +96,15 @@ export interface Dictionary {
       whatsapp: ServiceCopy & { action: string; unavailable: string };
       form: ContactFormCopy;
     };
+    footer: {
+      tagline: string;
+      explore: string;
+      links: { home: string; studio: string; contact: string };
+      connect: string;
+      socialNote: string;
+      socialUnavailable: string;
+      rights: string;
+      signOff: string;
+    };
   };
 }

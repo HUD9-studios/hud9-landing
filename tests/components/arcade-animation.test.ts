@@ -136,3 +136,27 @@ it('draws a still scene with reduced motion and responds to preference changes',
   motion.dispatchEvent(new Event('change'));
   expect(frameRequest).toHaveBeenCalledOnce();
 });
+
+it('repaints a visible paused scene on resize without advancing playback', async () => {
+  motion.matches = true;
+  vi.stubGlobal('devicePixelRatio', 3);
+  const canvas = document.createElement('canvas');
+  const rect = vi
+    .spyOn(canvas, 'getBoundingClientRect')
+    .mockReturnValue(new DOMRect(0, 0, 320, 275));
+  const cleanup = mountArcade(canvas);
+  await show();
+  expect([canvas.width, canvas.height]).toEqual([640, 550]);
+  const initial = latestPlayerFrame();
+
+  rect.mockReturnValue(new DOMRect(0, 0, 400, 345));
+  window.dispatchEvent(new Event('resize'));
+  expect([canvas.width, canvas.height]).toEqual([800, 690]);
+  expect(drawArcade).toHaveBeenCalledTimes(2);
+  expect(latestPlayerFrame()).toEqual(initial);
+  expect(frameRequest).not.toHaveBeenCalled();
+
+  cleanup();
+  window.dispatchEvent(new Event('resize'));
+  expect(drawArcade).toHaveBeenCalledTimes(2);
+});

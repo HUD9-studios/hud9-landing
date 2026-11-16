@@ -62,7 +62,7 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
+@media (orientation: landscape) and (prefers-reduced-motion: no-preference) {
   .story[data-studio-pinned] {
     min-block-size: calc(100vh + clamp(31.25rem, 110vh, 66rem));
     min-block-size: calc(100dvh + clamp(31.25rem, 110dvh, 66rem));

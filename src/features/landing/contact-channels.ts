@@ -11,5 +11,27 @@ export function getContactChannels() {
       number && /^[1-9]\d{7,14}$/.test(number)
         ? `https://wa.me/${number}`
         : undefined,
+    instagramHref: socialProfile(
+      process.env.HUD9_INSTAGRAM_URL,
+      'instagram.com',
+    ),
+    facebookHref: socialProfile(process.env.HUD9_FACEBOOK_URL, 'facebook.com'),
   };
+}
+
+function socialProfile(value: string | undefined, host: string) {
+  if (!value || !URL.canParse(value)) return undefined;
+  const url = new URL(value);
+  const correctHost = url.hostname === host || url.hostname === 'www.' + host;
+  if (
+    url.protocol !== 'https:' ||
+    !correctHost ||
+    url.username ||
+    url.password ||
+    url.port ||
+    url.pathname === '/'
+  )
+    return undefined;
+
+  return url.href;
 }
