@@ -49,9 +49,12 @@ function setupStory() {
   );
 
   const motion = Object.assign(new EventTarget(), { matches: false });
+  const landscape = Object.assign(new EventTarget(), { matches: true });
   vi.stubGlobal(
     'matchMedia',
-    vi.fn(() => motion),
+    vi.fn((query: string) =>
+      query === '(orientation: landscape)' ? landscape : motion,
+    ),
   );
   vi.stubGlobal('visualViewport', undefined);
   vi.stubGlobal('innerHeight', 900);
@@ -65,6 +68,7 @@ function setupStory() {
     frame,
     layout,
     motion,
+    landscape,
     requestFrame,
     scroll(position: number) {
       top = -position * 800;
@@ -110,6 +114,24 @@ it('uses the natural flow when the content cannot fit or motion is reduced', () 
   expect(page.story.hasAttribute('data-studio-pinned')).toBe(true);
   page.motion.matches = true;
   page.motion.dispatchEvent(new Event('change'));
+  expect(page.story.hasAttribute('data-studio-pinned')).toBe(false);
+  cleanup();
+});
+
+it('does not reserve pinned scroll space in portrait and remeasures on rotation', () => {
+  const page = setupStory();
+  page.landscape.matches = false;
+  const cleanup = mountStudioStory(page.story, page.frame, page.layout);
+  expect(page.story.hasAttribute('data-studio-pinned')).toBe(false);
+  page.scroll(0.52);
+  expect(page.requestFrame).not.toHaveBeenCalled();
+
+  page.landscape.matches = true;
+  page.landscape.dispatchEvent(new Event('change'));
+  expect(page.story.hasAttribute('data-studio-pinned')).toBe(true);
+
+  page.landscape.matches = false;
+  page.landscape.dispatchEvent(new Event('change'));
   expect(page.story.hasAttribute('data-studio-pinned')).toBe(false);
   cleanup();
 });

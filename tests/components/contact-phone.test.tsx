@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -81,6 +82,26 @@ it('navigates countries with arrow keys and supports pointer selection', () => {
   expect(screen.getByRole('button', { name: /Canada \+1/ })).toBe(
     document.activeElement,
   );
+});
+
+it('dismisses the country picker on outside interaction and preserves focus when tabbing away', () => {
+  const copy = getDictionary('en').landing.contact.form;
+  render(<ContactForm copy={copy} locale="en" />);
+  const trigger = screen.getByRole('button', { name: /Colombia \+57/ });
+  const number = screen.getByRole('textbox', { name: copy.phone.label });
+
+  fireEvent.click(trigger);
+  const search = screen.getByRole('combobox', { name: copy.phone.search });
+  fireEvent.pointerDown(search);
+  expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  fireEvent.pointerDown(number);
+  expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  expect(screen.queryByRole('listbox')).toBeNull();
+
+  fireEvent.click(trigger);
+  act(() => number.focus());
+  expect(document.activeElement).toBe(number);
+  expect(screen.queryByRole('listbox')).toBeNull();
 });
 
 it('keeps the phone optional and preserves invalid input while showing a translated error', () => {

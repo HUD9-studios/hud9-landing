@@ -2,6 +2,7 @@
 
 import { useRef, useState, type HTMLAttributes } from 'react';
 import type { Dictionary } from '@/i18n/dictionaries/types';
+import { landingSections } from './landing-sections';
 import styles from './SiteNavigation.module.scss';
 import { useHeaderSection, type HeaderSection } from './StickyHeader';
 import { WhatsAppLink } from './WhatsAppLink';
@@ -106,15 +107,9 @@ function NavigationLinks({
   dismissal: MenuDismissal;
   onNavigate: (id: string) => void;
 }) {
-  const links = [
-    ['home', copy.home],
-    ['studio', copy.studio],
-    ['contact', copy.contact],
-  ] as const;
-
   return (
     <ul>
-      {links.map(([id, label]) => (
+      {landingSections.map((id) => (
         <li key={id}>
           <a
             href={`#${id}`}
@@ -122,7 +117,7 @@ function NavigationLinks({
             {...dismissal}
             onClick={() => onNavigate(id)}
           >
-            {label}
+            {copy[id]}
           </a>
         </li>
       ))}

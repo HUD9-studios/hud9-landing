@@ -10,7 +10,9 @@ import {
   type RefObject,
 } from 'react';
 
-export type HeaderSection = 'home' | 'studio' | 'contact';
+import type { LandingSection } from './landing-sections';
+
+export type HeaderSection = LandingSection;
 
 const HeaderSectionContext = createContext<HeaderSection>('home');
 

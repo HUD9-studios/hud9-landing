@@ -133,6 +133,32 @@ function createStudio(t: Translate): Dictionary['landing']['studio'] {
   };
 }
 
+function createFooter(t: Translate): Dictionary['landing']['footer'] {
+  return {
+    tagline: t(
+      'Creamos videojuegos. Exploramos nuevas experiencias.',
+      'We create games. We explore new experiences.',
+    ),
+    explore: t('Explora', 'Explore'),
+    links: {
+      home: t('Inicio', 'Home'),
+      studio: t('El estudio', 'The Studio'),
+      contact: t('Contacto', 'Contact'),
+    },
+    connect: t('Conecta', 'Connect'),
+    socialNote: t(
+      'Mantente conectado con nuestro universo.',
+      'Stay connected with our universe.',
+    ),
+    socialUnavailable: t('No disponible', 'Unavailable'),
+    rights: t('Todos los derechos reservados.', 'All rights reserved.'),
+    signOff: t(
+      'FIN DE TRANSMISIÓN // HUD9 STUDIOS',
+      'END OF TRANSMISSION // HUD9 STUDIOS',
+    ),
+  };
+}
+
 function createDictionary(locale: Locale): Dictionary {
   const t: Translate = (es, en) => ({ es, en })[locale];
 
@@ -153,6 +179,7 @@ function createDictionary(locale: Locale): Dictionary {
       services: createServices(t),
       studio: createStudio(t),
       contact: createContact(t),
+      footer: createFooter(t),
     },
   };
 }

@@ -8,6 +8,7 @@ import { HeroIntro } from './HeroIntro';
 import styles from './LandingPage.module.scss';
 import { ServiceBar } from './ServiceBar';
 import { SiteHeader } from './SiteHeader';
+import { SiteFooter } from './footer/SiteFooter';
 import { StudioSection } from './StudioSection';
 
 export function LandingPage({
@@ -48,6 +49,7 @@ export function LandingPage({
           locale={locale}
         />
       </PageContainer>
+      <SiteFooter copy={copy.footer} channels={channels} />
     </div>
   );
 }

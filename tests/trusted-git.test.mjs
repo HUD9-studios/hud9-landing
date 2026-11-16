@@ -1,7 +1,8 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 import { resolveTrustedGit } from '../scripts/trusted-git.mjs';
 
-const { exists, realpath, stat } = vi.hoisted(() => ({
+const { access, exists, realpath, stat } = vi.hoisted(() => ({
+  access: vi.fn(),
   exists: vi.fn(),
   realpath: vi.fn(),
   stat: vi.fn(),
@@ -9,7 +10,7 @@ const { exists, realpath, stat } = vi.hoisted(() => ({
 
 vi.mock('node:process', () => ({ default: { platform: 'linux' } }));
 vi.mock('node:fs', () => ({
-  accessSync: vi.fn(),
+  accessSync: access,
   constants: { X_OK: 1 },
   existsSync: exists,
   realpathSync: { native: realpath },
@@ -50,5 +51,31 @@ it('rejects an executable below a writable parent directory', () => {
 
   expect(resolveTrustedGit).toThrow(
     'Could not verify a trusted Git executable',
+  );
+});
+
+function mockSystemExecutable() {
+  realpath.mockReturnValue('/usr/libexec/git');
+  stat.mockImplementation((path) => ({
+    isFile: () => path === '/usr/libexec/git',
+    uid: 0,
+    mode: 0o755,
+  }));
+}
+
+it('returns the resolved system executable after checking execute access', () => {
+  mockSystemExecutable();
+  expect(resolveTrustedGit()).toBe('/usr/libexec/git');
+  expect(access).toHaveBeenCalledExactlyOnceWith('/usr/libexec/git', 1);
+});
+
+it('retains the cause when a managed Git executable cannot be run', () => {
+  mockSystemExecutable();
+  const denied = new Error('Execute access denied');
+  access.mockImplementation(() => {
+    throw denied;
+  });
+  expect(() => resolveTrustedGit()).toThrow(
+    expect.objectContaining({ cause: denied }),
   );
 });
