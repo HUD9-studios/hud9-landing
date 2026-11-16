@@ -1,7 +1,7 @@
 import Image from 'next/image';
-import Link from 'next/link';
-import { locales, type Locale } from '@/i18n/config';
+import type { Locale } from '@/i18n/config';
 import type { Dictionary } from '@/i18n/dictionaries/types';
+import { LanguagePicker } from './LanguagePicker';
 import styles from './SiteHeader.module.scss';
 import { SiteNavigation } from './SiteNavigation';
 import { StickyHeader } from './StickyHeader';
@@ -11,9 +11,11 @@ type HeaderCopy = Dictionary['landing']['header'];
 export function SiteHeader({
   copy,
   locale,
+  whatsappHref,
 }: {
   copy: HeaderCopy;
   locale: Locale;
+  whatsappHref: string | undefined;
 }) {
   const { skip, language, languageNames, ...navigation } = copy;
 
@@ -34,7 +36,11 @@ export function SiteHeader({
               unoptimized
             />
           </a>
-          <SiteNavigation key={locale} copy={navigation} />
+          <SiteNavigation
+            key={locale}
+            copy={navigation}
+            whatsappHref={whatsappHref}
+          />
           <LanguagePicker
             label={language}
             names={languageNames}
@@ -43,37 +49,5 @@ export function SiteHeader({
         </div>
       </div>
     </StickyHeader>
-  );
-}
-
-function LanguagePicker({
-  label,
-  names,
-  locale,
-}: {
-  label: string;
-  names: HeaderCopy['languageNames'];
-  locale: Locale;
-}) {
-  return (
-    <details key={locale} className={styles.language}>
-      <summary aria-label={label + ' · ' + names[locale]}>
-        {locale}
-        <span aria-hidden="true" />
-      </summary>
-      <ul>
-        {locales.map((option) => (
-          <li key={option}>
-            <Link
-              href={option === 'es' ? '/es' : '/en'}
-              hrefLang={option}
-              aria-current={option === locale ? 'page' : undefined}
-            >
-              <span>{option.toUpperCase()}</span> {names[option]}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </details>
   );
 }

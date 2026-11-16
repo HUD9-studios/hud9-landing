@@ -57,7 +57,10 @@
 
 .main,
 .main :is(section, article)[id] {
-  scroll-margin-block-start: var(--landing-anchor-offset);
+  scroll-margin-block-start: var(
+    --landing-section-anchor,
+    var(--landing-anchor-offset)
+  );
 }
 
 .main section[data-studio-pinned] {

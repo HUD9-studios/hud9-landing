@@ -1,0 +1,267 @@
+@use '../breakpoints';
+
+.contact {
+  --contact-surface: rgb(4 20 32 / 88%);
+  --contact-line: #397489;
+  --contact-muted: #c2d3dd;
+  --contact-green: #56efad;
+  --contact-background: url('/images/contact/hud9-contact-background-desktop.webp');
+  --landing-section-anchor: 0px;
+  min-block-size: 100svh;
+  padding: max(4.75rem, calc(var(--landing-header-height) * 0.85 + 0.8rem))
+    var(--landing-gutter) clamp(3.5rem, 6vw, 6.5rem);
+  background:
+    linear-gradient(
+      180deg,
+      var(--studio-base),
+      transparent clamp(5rem, 10vw, 10rem)
+    ),
+    linear-gradient(
+      90deg,
+      transparent 12%,
+      rgb(3 9 16 / 58%) 36%,
+      rgb(3 9 16 / 39%)
+    ),
+    var(--contact-background) left center / cover no-repeat,
+    var(--studio-base);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.layout {
+  inline-size: min(100%, 100rem);
+  margin-inline: auto;
+}
+
+.intro {
+  margin-block-end: clamp(1.25rem, 1.5vw, 1.6rem);
+
+  h2 {
+    margin: 0.16em 0;
+    font: 700 clamp(2.15rem, 3.8vw, 3.4rem) / 0.99 var(--font-display);
+    letter-spacing: -0.02em;
+
+    strong {
+      display: block;
+      color: var(--landing-accent);
+      font-weight: inherit;
+    }
+  }
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  color: var(--landing-accent);
+  font: 700 clamp(0.95rem, 1.25vw, 1.25rem) / 1.2 var(--font-display);
+  letter-spacing: 0.05em;
+
+  &::before {
+    inline-size: clamp(1.5rem, 2.6vw, 2.75rem);
+    block-size: 0.2rem;
+    border-radius: 1rem;
+    background: currentColor;
+    box-shadow: 0 0 0.85rem rgb(0 239 255 / 52%);
+    content: '';
+  }
+}
+
+.description {
+  max-inline-size: 58ch;
+  margin: 0.65rem 0 0;
+  color: var(--contact-muted);
+  font-size: clamp(0.98rem, 1.22vw, 1.21rem);
+}
+
+.content {
+  display: grid;
+  gap: clamp(1rem, 1.6vw, 1.65rem);
+}
+
+.channels {
+  display: grid;
+  gap: clamp(0.75rem, 1.2vw, 1.2rem);
+  align-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(0.75rem, 1.3vw, 1.4rem);
+  padding: clamp(0.95rem, 1.3vw, 1.45rem);
+  border: 1px solid var(--contact-line);
+  border-radius: 1rem 0.75rem;
+  background: linear-gradient(
+    145deg,
+    rgb(8 32 46 / 92%),
+    var(--contact-surface)
+  );
+  box-shadow: inset 0 0.25rem 0.9rem rgb(0 239 255 / 5%);
+
+  h3 {
+    margin: 0 0 0.15em;
+    font: 700 clamp(1.35rem, 1.8vw, 1.75rem) / 1.1 var(--font-display);
+  }
+
+  p {
+    margin: 0;
+    color: var(--contact-muted);
+    font-size: clamp(0.91rem, 1vw, 1.05rem);
+    line-height: 1.44;
+  }
+
+  a[href^='mailto:'] {
+    display: inline-block;
+    margin-block-start: 0.55rem;
+    color: var(--landing-accent);
+    overflow-wrap: anywhere;
+  }
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  inline-size: clamp(2.55rem, 4.25vw, 4.05rem);
+  aspect-ratio: 1;
+  border-radius: 0.8rem;
+  color: var(--landing-accent);
+  background: #062b3d;
+  box-shadow: inset 0 0 1rem rgb(0 239 255 / 8%);
+
+  svg {
+    inline-size: 64%;
+  }
+}
+
+.card .status {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-block-start: 0.65rem;
+  color: var(--landing-accent);
+  font: 700 1rem / 1.2 var(--font-display);
+  text-transform: uppercase;
+
+  &::before {
+    flex: 0 0 0.53rem;
+    block-size: 0.53rem;
+    border-radius: 50%;
+    background: var(--contact-green);
+    box-shadow: 0 0 0.55rem rgb(86 239 173 / 65%);
+    content: '';
+  }
+}
+
+.whatsapp {
+  border-color: #318b70;
+
+  .icon {
+    color: var(--contact-green);
+    background: #07372c;
+  }
+}
+
+.whatsappAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  max-inline-size: 100%;
+  margin-block-start: 0.7rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #45b797;
+  border-radius: 0.55rem;
+  color: #e0f7ee;
+  background: linear-gradient(145deg, #0a4d3b, #082a26);
+  font: 700 1rem / 1.15 var(--font-display);
+  text-align: start;
+  text-decoration: none;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:any-link:hover {
+    border-color: var(--contact-green);
+  }
+
+  svg {
+    flex: 0 0 1.3rem;
+    inline-size: 1.3rem;
+  }
+}
+
+.card .unavailable {
+  margin-block-start: 0.4rem;
+  font-size: 0.79rem;
+}
+
+@media (width >= breakpoints.$navigation) {
+  .content {
+    grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.25fr);
+  }
+
+  .channels {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+@media (width >= breakpoints.$wide) and (orientation: landscape) {
+  .layout {
+    padding-inline-start: min(20vw, 20.5rem);
+  }
+}
+
+@media (orientation: portrait), (width < breakpoints.$compact) {
+  .contact {
+    --contact-background: url('/images/contact/hud9-contact-background-portrait.webp');
+    background:
+      linear-gradient(180deg, var(--studio-base), transparent 7rem),
+      linear-gradient(90deg, rgb(3 9 16 / 22%), rgb(3 9 16 / 58%)),
+      var(--contact-background) left center / cover no-repeat,
+      var(--studio-base);
+  }
+}
+
+@media (width < breakpoints.$navigation) {
+  .layout {
+    max-inline-size: 43rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .intro,
+    .content > * {
+      animation: contact-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 18%;
+
+      &:focus-within {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes contact-enter {
+  from {
+    opacity: 0.65;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
