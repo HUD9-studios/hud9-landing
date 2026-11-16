@@ -18,8 +18,9 @@ type PhoneProps = {
   locale: Locale;
   value: PhoneDraft;
   error: string | undefined;
+  methodErrorId: string | undefined;
   onChange: (next: PhoneDraft) => void;
-  onTouched: () => void;
+  onTouched: (normalized?: PhoneDraft) => void;
 };
 
 export function ContactPhone({
@@ -27,6 +28,7 @@ export function ContactPhone({
   locale,
   value: { phone, phoneCountry },
   error,
+  methodErrorId,
   onChange,
   onTouched,
 }: PhoneProps) {
@@ -53,16 +55,14 @@ export function ContactPhone({
             autoComplete="tel-national"
             placeholder={copy.placeholder}
             value={phone}
-            aria-invalid={Boolean(error) || undefined}
-            aria-describedby={error ? errorId : undefined}
+            aria-invalid={Boolean(error || methodErrorId) || undefined}
+            aria-describedby={error ? errorId : methodErrorId}
             onChange={(event) =>
               onChange({ phone: event.currentTarget.value, phoneCountry })
             }
-            onBlur={() => {
-              const number = splitInternationalPhone(phone, phoneCountry);
-              if (number) onChange(number);
-              onTouched();
-            }}
+            onBlur={() =>
+              onTouched(splitInternationalPhone(phone, phoneCountry))
+            }
             onPaste={(event) =>
               pasteInternationalPhone(event, phoneCountry, onChange)
             }

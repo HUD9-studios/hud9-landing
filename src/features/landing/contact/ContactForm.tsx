@@ -5,12 +5,13 @@ import type { Locale } from '@/i18n/config';
 import type { Dictionary } from '@/i18n/dictionaries/types';
 import { LandingIcon } from '../LandingIcon';
 import {
-  emptyDraft,
+  emptyContactSession,
   readContactDraft,
   saveContactDraft,
   type ContactDraft,
 } from './contact-draft';
 import {
+  contactEmailPattern,
   messageLimit,
   validateContactDraft,
   type ContactFieldName,
@@ -20,53 +21,53 @@ import { ContactPhone } from './ContactPhone';
 
 type FormCopy = Dictionary['landing']['contact']['form'];
 type FieldControl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+const contactMethodErrorId = 'contact-method-error';
 
 function useContactFields(copy: FormCopy) {
-  const [draft, setDraft] = useState(emptyDraft);
-  const [touched, setTouched] = useState<
-    Partial<Record<ContactFieldName, boolean>>
-  >({});
+  const [session, setSession] = useState(emptyContactSession);
+  const { draft, touched } = session;
   const { errors } = validateContactDraft(draft, copy.reasons);
+  const showMethodError = Boolean(
+    errors.contactMethod && (touched.email || touched.phone),
+  );
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      setDraft((current) =>
-        current === emptyDraft ? readContactDraft(copy.reasons) : current,
+      setSession((current) =>
+        current === emptyContactSession
+          ? readContactDraft(copy.reasons)
+          : current,
       );
     });
     return () => window.cancelAnimationFrame(frame);
   }, [copy.reasons]);
-
-  function markTouched(field: ContactFieldName) {
-    setTouched((current) => ({ ...current, [field]: true }));
-  }
 
   function errorFor(field: ContactFieldName) {
     const error = errors[field];
     return touched[field] && error ? copy[error] : undefined;
   }
 
-  function update(fields: Partial<ContactDraft>) {
-    const next = { ...draft, ...fields };
-    setDraft(next);
+  function update(fields: Partial<ContactDraft>, touch?: ContactFieldName) {
+    const next = {
+      draft: { ...draft, ...fields },
+      touched: touch ? { ...touched, [touch]: true as const } : touched,
+    };
+    setSession(next);
     saveContactDraft(next);
   }
 
   function bind(field: Exclude<ContactFieldName, 'phone'>) {
     const id = `contact-${field}`;
     const error = errorFor(field);
-    const descriptions = [
-      error ? `${id}-error` : '',
-      field === 'message' ? 'contact-message-count' : '',
-    ].filter(Boolean);
+    const methodError = field === 'email' && showMethodError;
 
     return {
       id,
       name: field,
       value: draft[field],
-      'aria-invalid': Boolean(error) || undefined,
-      'aria-describedby': descriptions.join(' ') || undefined,
-      onBlur: () => markTouched(field),
+      'aria-invalid': Boolean(error || methodError) || undefined,
+      'aria-describedby': fieldDescriptions(field, error, methodError),
+      onBlur: () => update({}, field),
       onChange: (event: ChangeEvent<FieldControl>) => {
         const control = event.currentTarget;
         const value =
@@ -78,7 +79,23 @@ function useContactFields(copy: FormCopy) {
     };
   }
 
-  return { bind, draft, errorFor, markTouched, update };
+  return { bind, draft, errorFor, showMethodError, update };
+}
+
+function fieldDescriptions(
+  field: ContactFieldName,
+  error: string | undefined,
+  methodError: boolean,
+) {
+  return (
+    [
+      error ? `contact-${field}-error` : '',
+      field === 'message' ? 'contact-message-count' : '',
+      methodError ? contactMethodErrorId : '',
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined
+  );
 }
 
 type FieldProps = ReturnType<ReturnType<typeof useContactFields>['bind']>;
@@ -108,35 +125,61 @@ export function ContactForm({
         locale={locale}
         value={fields.draft}
         error={fields.errorFor('phone')}
+        methodErrorId={
+          fields.showMethodError ? contactMethodErrorId : undefined
+        }
         onChange={fields.update}
-        onTouched={() => fields.markTouched('phone')}
+        onTouched={(phone) => fields.update(phone ?? {}, 'phone')}
       />
+      {fields.showMethodError && (
+        <p id={contactMethodErrorId} className={styles.error} role="alert">
+          {copy.contactMethodRequired}
+        </p>
+      )}
       <ContactReason
         copy={copy}
         field={fields.bind('reason')}
         error={fields.errorFor('reason')}
       />
+      <ContactMessageField
+        copy={copy}
+        field={fields.bind('message')}
+        error={fields.errorFor('message')}
+      />
+      <ContactSubmit copy={copy} />
+    </form>
+  );
+}
+
+function ContactMessageField({
+  copy,
+  field,
+  error,
+}: {
+  copy: Pick<FormCopy, 'message' | 'characterCount'>;
+  field: FieldProps;
+  error: string | undefined;
+}) {
+  return (
+    <>
       <ContactField
         label={copy.message.label}
         icon="message"
-        field={fields.bind('message')}
-        error={fields.errorFor('message')}
-        required
+        field={field}
+        error={error}
       >
         <textarea
-          {...fields.bind('message')}
+          {...field}
           placeholder={copy.message.placeholder}
           maxLength={messageLimit}
           rows={3}
-          required
         />
       </ContactField>
       <p id="contact-message-count" className={styles.count}>
         <span className={styles.srOnly}>{copy.characterCount} </span>
-        {fields.draft.message.length}/{messageLimit}
+        {field.value.length}/{messageLimit}
       </p>
-      <ContactSubmit copy={copy} />
-    </form>
+    </>
   );
 }
 
@@ -173,17 +216,9 @@ function ContactReason({
   error: string | undefined;
 }) {
   return (
-    <ContactField
-      label={reason.label}
-      icon="games"
-      field={field}
-      error={error}
-      required
-    >
-      <select {...field} required>
-        <option value="" disabled>
-          {reason.placeholder}
-        </option>
+    <ContactField label={reason.label} icon="games" field={field} error={error}>
+      <select {...field}>
+        <option value="">{reason.placeholder}</option>
         {Object.entries(reasons).map(([key, label]) => (
           <option key={key} value={key}>
             {label}
@@ -208,6 +243,7 @@ function ContactInputs({
 }) {
   return inputs.map(({ name, type, icon }) => {
     const field = fields.bind(name);
+    const required = name === 'name';
     return (
       <ContactField
         key={name}
@@ -215,14 +251,15 @@ function ContactInputs({
         icon={icon}
         field={field}
         error={fields.errorFor(name)}
-        required
+        required={required}
       >
         <input
           {...field}
           type={type}
           autoComplete={name}
           placeholder={copy[name].placeholder}
-          required
+          pattern={name === 'email' ? contactEmailPattern : undefined}
+          required={required}
         />
       </ContactField>
     );
@@ -240,7 +277,7 @@ function ContactField({
   label: string;
   icon: 'person' | 'email' | 'games' | 'message';
   field: FieldProps;
-  required: boolean;
+  required?: boolean;
   error: string | undefined;
   children: ReactNode;
 }) {

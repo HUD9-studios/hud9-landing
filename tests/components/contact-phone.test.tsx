@@ -86,6 +86,9 @@ it('navigates countries with arrow keys and supports pointer selection', () => {
 it('keeps the phone optional and preserves invalid input while showing a translated error', () => {
   const copy = getDictionary('es').landing.contact.form;
   render(<ContactForm copy={copy} locale="es" />);
+  fireEvent.change(screen.getByRole('textbox', { name: copy.email.label }), {
+    target: { value: 'studio@example.com' },
+  });
   const phone = screen.getByRole<HTMLInputElement>('textbox', {
     name: copy.phone.label,
   });

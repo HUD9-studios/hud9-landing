@@ -64,11 +64,14 @@ function createFormCopy(t: Translate): ContactCopy['form'] {
       noResults: t('No se encontraron países.', 'No countries found.'),
     },
     reason: {
-      label: t('Motivo del contacto', 'Reason for reaching out'),
-      placeholder: t('Selecciona una opción', 'Select an option'),
+      label: t(
+        'Motivo del contacto (opcional)',
+        'Reason for reaching out (optional)',
+      ),
+      placeholder: t('Sin seleccionar', 'No option selected'),
     },
     message: {
-      label: t('Tu mensaje', 'Your message'),
+      label: t('Tu mensaje (opcional)', 'Your message (optional)'),
       placeholder: t(
         'Cuéntanos qué tienes en mente…',
         'Tell us what you have in mind…',
@@ -87,7 +90,21 @@ function createFormCopy(t: Translate): ContactCopy['form'] {
       'El envío todavía no está disponible.',
       'Sending is not available yet.',
     ),
+    ...createValidationCopy(t),
+  };
+}
+
+function createValidationCopy(t: Translate) {
+  return {
     required: t('Completa este campo.', 'Complete this field.'),
+    nameLength: t(
+      'El nombre debe tener entre 2 y 100 caracteres.',
+      'Enter a name between 2 and 100 characters.',
+    ),
+    contactMethodRequired: t(
+      'Introduce un correo electrónico o un teléfono.',
+      'Enter an email address or a phone number.',
+    ),
     invalidEmail: t(
       'Introduce un correo electrónico válido.',
       'Enter a valid email address.',
@@ -95,6 +112,14 @@ function createFormCopy(t: Translate): ContactCopy['form'] {
     invalidPhone: t(
       'Introduce un teléfono válido, sin extensión.',
       'Enter a valid phone number without an extension.',
+    ),
+    invalidReason: t(
+      'Selecciona un motivo de la lista.',
+      'Choose a reason from the list.',
+    ),
+    messageTooShort: t(
+      'El mensaje debe tener al menos 10 caracteres.',
+      'Enter a message with at least 10 characters.',
     ),
     messageTooLong: t(
       'El mensaje no puede superar los 500 caracteres.',

@@ -60,18 +60,10 @@ it('validates required fields and email, counts the message, and leaves submissi
   const form = screen.getByRole<HTMLFormElement>('form', {
     name: copy.form.title,
   });
-  const required = ['name', 'email', 'reason', 'message'] as const;
-  for (const field of required) {
-    const input = screen.getByRole(
-      field === 'reason' ? 'combobox' : 'textbox',
-      {
-        name: copy.form[field].label,
-      },
-    );
-    expect(input.hasAttribute('required')).toBe(true);
-    fireEvent.blur(input);
-    expect(input.getAttribute('aria-invalid')).toBe('true');
-  }
+  const name = screen.getByRole('textbox', { name: copy.form.name.label });
+  expect(name.hasAttribute('required')).toBe(true);
+  fireEvent.blur(name);
+  expect(name.getAttribute('aria-invalid')).toBe('true');
   expect(
     screen
       .getByRole('textbox', { name: copy.form.phone.label })
@@ -79,30 +71,79 @@ it('validates required fields and email, counts the message, and leaves submissi
   ).toBe(false);
   expect(form.checkValidity()).toBe(false);
 
-  const email = screen.getByRole('textbox', { name: copy.form.email.label });
-  fireEvent.change(email, { target: { value: 'invalid' } });
+  const email = screen.getByRole<HTMLInputElement>('textbox', {
+    name: copy.form.email.label,
+  });
+  expect(email.hasAttribute('required')).toBe(false);
+  fireEvent.change(email, { target: { value: 'holmesmojica@gmail' } });
+  expect(email.validity.patternMismatch).toBe(true);
+  expect(email.hasAttribute('aria-invalid')).toBe(false);
+  fireEvent.blur(email);
   expect(screen.getByText(copy.form.invalidEmail).id).toBe(
     email.getAttribute('aria-describedby'),
   );
-  fireEvent.change(email, { target: { value: 'studio@example.com' } });
+  fireEvent.change(email, { target: { value: 'holmesmojica@gmail.com' } });
+  expect(email.validity.valid).toBe(true);
   expect(email.hasAttribute('aria-invalid')).toBe(false);
 
   const message = screen.getByRole<HTMLTextAreaElement>('textbox', {
     name: copy.form.message.label,
   });
+  const reason = screen.getByRole<HTMLSelectElement>('combobox', {
+    name: copy.form.reason.label,
+  });
+  fireEvent.change(name, { target: { value: 'Ada' } });
+  fireEvent.change(reason, { target: { value: 'game' } });
+  fireEvent.change(reason, { target: { value: '' } });
+  expect(reason.value).toBe('');
+  for (const field of [reason, message]) {
+    fireEvent.blur(field);
+    expect(field.hasAttribute('required')).toBe(false);
+    expect(field.hasAttribute('aria-invalid')).toBe(false);
+  }
+  expect(form.checkValidity()).toBe(true);
+  fireEvent.change(message, { target: { value: '  Hola  ' } });
+  expect(screen.getByText(copy.form.messageTooShort).id).toBeTruthy();
+  expect(message.value).toBe('  Hola  ');
   fireEvent.change(message, { target: { value: 'a'.repeat(505) } });
   expect(message.maxLength).toBe(500);
   expect(message.value).toHaveLength(500);
   expect(screen.getByText('500/500')).toBeTruthy();
-  fireEvent.change(
-    screen.getByRole('textbox', { name: copy.form.name.label }),
-    { target: { value: 'Ada' } },
-  );
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'game' } });
   expect(form.checkValidity()).toBe(true);
   expect(fireEvent.submit(form)).toBe(false);
   expect(message.value).toHaveLength(500);
 });
+
+it.each(['es', 'en'] as const)(
+  'links the shared contact requirement to both inputs in %s',
+  (locale) => {
+    const copy = getDictionary(locale).landing.contact;
+    render(
+      <ContactSection copy={copy} channels={unsetChannels} locale={locale} />,
+    );
+    const email = screen.getByRole('textbox', { name: copy.form.email.label });
+    const phone = screen.getByRole('textbox', { name: copy.form.phone.label });
+    expect(screen.queryByRole('alert')).toBeNull();
+    fireEvent.blur(phone);
+    const error = screen.getByRole('alert');
+    expect(error.textContent).toBe(copy.form.contactMethodRequired);
+    for (const input of [email, phone]) {
+      expect(input.getAttribute('aria-describedby')).toBe(error.id);
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+    }
+
+    fireEvent.change(phone, { target: { value: '+44 20 7946 0018' } });
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(email.hasAttribute('aria-invalid')).toBe(false);
+    expect(phone.hasAttribute('aria-invalid')).toBe(false);
+    fireEvent.change(phone, { target: { value: '' } });
+    expect(screen.getByRole('alert').textContent).toBe(
+      copy.form.contactMethodRequired,
+    );
+    fireEvent.change(email, { target: { value: 'studio@example.com' } });
+    expect(screen.queryByRole('alert')).toBeNull();
+  },
+);
 
 it('restores the draft in the same tab after switching to the other language', async () => {
   const spanish = getDictionary('es').landing.contact;
@@ -130,4 +171,41 @@ it('restores the draft in the same tab after switching to the other language', a
   expect(screen.getByDisplayValue(english.form.reasons.immersive)).toBeTruthy();
   expect(screen.getByDisplayValue('Hola')).toBeTruthy();
   expect(screen.getByText('4/500')).toBeTruthy();
+  expect(screen.queryByRole('alert')).toBeNull();
+});
+
+it('relocalizes a touched field error after changing language and clears it after correction', async () => {
+  const spanish = getDictionary('es').landing.contact;
+  const { unmount } = render(
+    <ContactSection copy={spanish} channels={unsetChannels} locale="es" />,
+  );
+  const invalid = '+44 20';
+  const phone = screen.getByRole('textbox', { name: spanish.form.phone.label });
+  fireEvent.change(phone, { target: { value: invalid } });
+  fireEvent.blur(phone);
+  expect(screen.getByRole('alert').textContent).toBe(spanish.form.invalidPhone);
+
+  const name = screen.getByRole('textbox', { name: spanish.form.name.label });
+  fireEvent.change(name, { target: { value: ' A ' } });
+  expect(screen.queryByText(spanish.form.nameLength)).toBeNull();
+  unmount();
+
+  const english = getDictionary('en').landing.contact;
+  render(
+    <ContactSection copy={english} channels={unsetChannels} locale="en" />,
+  );
+  expect((await screen.findByRole('alert')).textContent).toBe(
+    english.form.invalidPhone,
+  );
+  const restoredPhone = screen.getByRole<HTMLInputElement>('textbox', {
+    name: english.form.phone.label,
+  });
+  expect(restoredPhone.value).toBe(invalid);
+  expect(screen.queryByText(english.form.nameLength)).toBeNull();
+  fireEvent.blur(
+    screen.getByRole('textbox', { name: english.form.name.label }),
+  );
+  expect(screen.getByText(english.form.nameLength)).toBeTruthy();
+  fireEvent.change(restoredPhone, { target: { value: '+44 20 7946 0018' } });
+  expect(screen.queryByText(english.form.invalidPhone)).toBeNull();
 });

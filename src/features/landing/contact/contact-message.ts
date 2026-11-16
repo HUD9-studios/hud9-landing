@@ -5,24 +5,32 @@ import { parseContactPhone } from './contact-phone';
 
 export const messageLimit = 500;
 
+const domainLabel = String.raw`[a-zA-Z\d](?:[a-zA-Z\d\-]{0,61}[a-zA-Z\d])?`;
+export const contactEmailPattern = String.raw`[\w.!#$%&'*+\/=?^\x60\{\|\}~\-]+@${domainLabel}(?:\.${domainLabel})+`;
+const emailFormat = new RegExp(`^${contactEmailPattern}$`, 'u');
+
 type Reasons = Dictionary['landing']['contact']['form']['reasons'];
 type ContactReason = keyof Reasons;
 export type ContactFieldName = Exclude<keyof ContactDraft, 'phoneCountry'>;
-export type ContactErrors = Partial<
-  Record<
-    ContactFieldName,
-    'required' | 'invalidEmail' | 'invalidPhone' | 'messageTooLong'
-  >
->;
+type ContactErrors = Partial<{
+  name: 'required' | 'nameLength';
+  email: 'invalidEmail';
+  phone: 'invalidPhone';
+  contactMethod: 'contactMethodRequired';
+  reason: 'invalidReason';
+  message: 'messageTooShort' | 'messageTooLong';
+}>;
+
+type ContactMethod =
+  | { email: string; phone?: E164Number }
+  | { email?: never; phone: E164Number };
 
 /** Local model for a valid message. The API adapter will map it to the API contract. */
-export interface ContactMessage {
+export type ContactMessage = ContactMethod & {
   name: string;
-  email: string;
-  phone?: E164Number;
-  reason: ContactReason;
-  message: string;
-}
+  reason?: ContactReason;
+  message?: string;
+};
 
 export function isContactReason(
   value: string,
@@ -33,41 +41,71 @@ export function isContactReason(
 
 export function validateContactDraft(draft: ContactDraft, reasons: Reasons) {
   const name = draft.name.trim();
-  const email = draft.email.trim();
-  const phone = draft.phone.trim();
   const message = draft.message.trim();
-  const reason = draft.reason;
-  const phoneNumber = phone
-    ? parseContactPhone(phone, draft.phoneCountry)?.number
+  const reason = isContactReason(draft.reason, reasons)
+    ? draft.reason
     : undefined;
-  const errors: ContactErrors = {};
-  const validReason = isContactReason(reason, reasons);
+  const { errors, method } = validateContactMethods(draft);
 
-  if (!name) errors.name = 'required';
-  const emailError = validateEmail(email);
-  if (emailError) errors.email = emailError;
-  if (phone && !phoneNumber) errors.phone = 'invalidPhone';
-  if (!validReason) errors.reason = 'required';
-  if (!message) errors.message = 'required';
-  else if (draft.message.length > messageLimit)
-    errors.message = 'messageTooLong';
+  const nameError = validateName(name);
+  const messageError = validateMessage(message, draft.message.length);
+  if (nameError) errors.name = nameError;
+  if (draft.reason && !reason) errors.reason = 'invalidReason';
+  if (messageError) errors.message = messageError;
 
   const submission: ContactMessage | undefined =
-    validReason && !Object.keys(errors).length
-      ? { name, email, phone: phoneNumber, reason, message }
+    method && !errors.reason && !errors.name && !errors.message
+      ? { ...method, name, reason, message: message || undefined }
       : undefined;
 
   return { errors, submission };
 }
 
-function validateEmail(email: string) {
-  if (!email) return 'required';
-  // Match the syntax used by the native email input.
-  if (
-    !/^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i.test(
-      email,
-    )
-  ) {
-    return 'invalidEmail';
-  }
+function validateName(name: string): ContactErrors['name'] {
+  if (!name) return 'required';
+  const length = [...name.normalize()].length;
+  if (length < 2 || length > 100) return 'nameLength';
+}
+
+function validateMessage(
+  message: string,
+  rawLength: number,
+): ContactErrors['message'] {
+  if (!message) return;
+  if (message.length < 10) return 'messageTooShort';
+  if (rawLength > messageLimit) return 'messageTooLong';
+}
+
+function validateContactMethods(draft: ContactDraft): {
+  errors: ContactErrors;
+  method?: ContactMethod;
+} {
+  const email = draft.email.trim();
+  const phone = draft.phone.trim();
+  if (!email && !phone)
+    return { errors: { contactMethod: 'contactMethodRequired' } };
+
+  const phoneNumber = phone
+    ? parseContactPhone(phone, draft.phoneCountry)?.number
+    : undefined;
+  const errors: ContactErrors = {};
+  if (phone && !phoneNumber) errors.phone = 'invalidPhone';
+  if (!email)
+    return phoneNumber
+      ? { errors, method: { phone: phoneNumber } }
+      : { errors };
+
+  if (!isContactEmail(email)) errors.email = 'invalidEmail';
+  if (errors.email || errors.phone) return { errors };
+  return { errors, method: { email, phone: phoneNumber } };
+}
+
+function isContactEmail(email: string) {
+  const [local] = email.split('@');
+  return (
+    !local.startsWith('.') &&
+    !local.endsWith('.') &&
+    !local.includes('..') &&
+    emailFormat.test(email)
+  );
 }

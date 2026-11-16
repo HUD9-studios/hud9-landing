@@ -20,8 +20,12 @@ interface ContactFormCopy {
   submit: string;
   unavailable: string;
   required: string;
+  nameLength: string;
+  contactMethodRequired: string;
   invalidEmail: string;
   invalidPhone: string;
+  invalidReason: string;
+  messageTooShort: string;
   messageTooLong: string;
 }
 
